@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 
 const inquirer = require("inquirer");
+const shell = require("shelljs");
 const chalk = require("chalk");
 const figlet = require("figlet");
-const shell = require("shelljs");
+const opn = require('opn');
 const terminalLink = require('terminal-link');
+
 const commanderApi = "https://apigcp.nimbella.io/api/v1/web/nikhilni-5kbaqxyq6lj/portal/gateway";
 let auth = null;
 let user_id = null;
@@ -36,6 +38,7 @@ const init = () => {
             })
         )
     );
+    console.log("CLI which allows you to create, run & publish your serverless functions as commands\n");
     const nimbella = terminalLink('Presented to you by Nimbella', 'https://nimbella.com');
     console.log(nimbella);
 }
@@ -64,6 +67,14 @@ const getCommand = () => {
 
 const renderResult = (result) => {
     if (result) {
+        let hyperlink = result.substring(
+            result.lastIndexOf("<") + 1,
+            result.lastIndexOf(">")
+        );
+        if (hyperlink) {
+           hyperlink = hyperlink.split("|")[0];
+           opn(hyperlink);
+        }
         console.log(
             chalk.white.bgBlack.bold(`${result}\n`)
         );
