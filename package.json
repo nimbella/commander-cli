@@ -1,0 +1,33 @@
+{
+  "name": "commander-cli",
+  "version": "0.0.1",
+  "description": "Commander CLI",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nimbella-corp/commander-cli.git"
+  },
+  "keywords": [
+    "commander",
+    "nimbella",
+    "serverless",
+    "cli"
+  ],
+  "author": "Nikhil",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nimbella-corp/commander-cli/issues"
+  },
+  "homepage": "https://github.com/nimbella-corp/commander-cli#readme",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "chalk": "^3.0.0",
+    "figlet": "^1.3.0",
+    "inquirer": "^7.1.0",
+    "shelljs": "^0.8.3",
+    "terminal-link": "^2.1.1"
+  }
+}
