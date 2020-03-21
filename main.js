@@ -7,7 +7,6 @@ const figlet = require("figlet");
 const opn = require('opn');
 const terminalLink = require('terminal-link');
 
-const commanderApi = "https://apigcp.nimbella.io/api/v1/web/nikhilni-5kbaqxyq6lj/portal/gateway";
 let auth = null;
 let user_id = null;
 let team_id = null;
@@ -36,7 +35,6 @@ const init = () => {
     auth = res.stdout;
     const secret = auth.split(":");
     user_id = secret[0], team_id = secret[1];
-    console.log("USer id, team id", user_id, team_id);
 
     console.log(
         chalk.green(
@@ -49,6 +47,8 @@ const init = () => {
     console.log("CLI which allows you to create, run & publish your serverless functions as commands\n");
     const nimbella = terminalLink('Presented to you by Nimbella', 'https://nimbella.com');
     console.log(nimbella);
+    console.log("Your user id: ", user_id);
+    console.log("Your team id: ", team_id);
 }
 
 const getHelp = () => {
@@ -140,5 +140,10 @@ const run = async () => {
         renderResult(result);
     }
 };
+
+process.on('SIGINT', function() {
+    console.log("Shutting down gracefully");
+    process.exit();
+});
 
 run();
