@@ -1,0 +1,105 @@
+#!/bin/bash
+#
+# Nimbella CONFIDENTIAL
+# ---------------------
+#
+#   2018 - present Nimbella Corp
+#   All Rights Reserved.
+#
+# NOTICE:
+#
+# All information contained herein is, and remains the property of
+# Nimbella Corp and its suppliers, if any.  The intellectual and technical
+# concepts contained herein are proprietary to Nimbella Corp and its
+# suppliers and may be covered by U.S. and Foreign Patents, patents
+# in process, and are protected by trade secret or copyright law.
+#
+# Dissemination of this information or reproduction of this material
+# is strictly forbidden unless prior written permission is obtained
+# from Nimbella Corp.
+#
+
+---
+extends: eslint:recommended
+
+env:
+  browser: false
+  node: true
+  es6: true
+  jest: true
+
+parserOptions:
+  ecmaVersion: 2018
+  sourceType: "module"
+  ecmaFeatures:
+    jsx: false
+    experimentalObjectRestSpread: true
+
+globals:
+  __DEV__: true
+  __SERVER__: true
+
+plugins:
+  - jest
+
+rules:
+  semi: 2
+  key-spacing: 2
+  curly: 2
+  consistent-return: 2
+  space-infix-ops: 2
+  camelcase: 0
+  no-spaced-func: 2
+  no-alert: 2
+  eol-last: 2
+  comma-spacing: 2
+  eqeqeq: 2
+  keyword-spacing: 2
+
+  # possible errors
+  comma-dangle: 2
+  no-cond-assign: 2
+  no-console: 0
+  no-constant-condition: 2
+  no-control-regex: 2
+  no-debugger: 2
+  no-dupe-args: 2
+  no-dupe-keys: 2
+  no-duplicate-case: 2
+  no-empty-character-class: 2
+  no-empty: 2
+  no-ex-assign: 2
+  no-extra-boolean-cast: 2
+  no-extra-parens: 2
+  no-extra-semi: 2
+  no-func-assign: 2
+  no-inner-declarations: 2
+  no-invalid-regexp: 2
+  prefer-named-capture-group: 0
+  no-irregular-whitespace: 2
+  no-negated-in-lhs: 2
+  no-obj-calls: 2
+  no-regex-spaces: 2
+  no-sparse-arrays: 2
+  no-unexpected-multiline: 2
+  no-unreachable: 2
+  use-isnan: 2
+  valid-jsdoc: 2
+  valid-typeof: 2
+  no-useless-escape: 0
+  no-prototype-builtins: 0
+
+  no-redeclare: 2
+
+  init-declarations: 2
+  no-catch-shadow: 2
+  no-delete-var: 2
+  no-label-var: 2
+  no-shadow-restricted-names: 2
+  no-shadow: 2
+  no-undef-init: 2
+  no-undef: 2
+  no-undefined: 2
+  no-unused-vars: 2
+  no-use-before-define: [2, "nofunc"]
+  no-trailing-spaces: 2

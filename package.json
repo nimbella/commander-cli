@@ -4,7 +4,8 @@
   "description": "Commander CLI",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint \"*.js\" --fix --ignore-pattern node_modules/"
   },
   "repository": {
     "type": "git",
@@ -17,11 +18,17 @@
     "cli"
   ],
   "author": "Nikhil",
-  "license": "ISC",
+  "license": "LicenseRef-LICENSE.md",
   "bugs": {
     "url": "https://github.com/nimbella-corp/commander-cli/issues"
   },
   "homepage": "https://github.com/nimbella-corp/commander-cli#readme",
+  "devDependencies": {
+    "eslint": "^6.4.0",
+    "eslint-config-prettier": "^6.3.0",
+    "eslint-plugin-jest": "^22.5.1",
+    "eslint-plugin-prettier": "^3.1.0"
+  },
   "dependencies": {
     "axios": "^0.19.2",
     "chalk": "^3.0.0",
