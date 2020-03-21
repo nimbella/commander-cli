@@ -12,6 +12,14 @@ let auth = null;
 let user_id = null;
 let team_id = null;
 
+const helpOutput = {
+    "What is Commander, what can I do with it?": "https://nimbella.com/resources-commander/overview#what-is-commander",
+    "Commander command reference": "https://nimbella.com/resources-commander/reference#command-reference",
+    "Creating and deploying custom commands": "https://www.youtube.com/watch?v=HxaLII_IGzY",
+    "What are Command-sets and how do I build them?": "https://github.com/nimbella/command-sets",
+    "Quick start on using Commander": "https://nimbella.com/resources-commander/quickstart#quickstart"
+}
+
 const init = () => {
     if (!shell.which('nim')) {
         shell.echo('Commander CLI requires nim. ' +
@@ -43,6 +51,21 @@ const init = () => {
     console.log(nimbella);
 }
 
+const getHelp = () => {
+    const help = [
+        {
+            type: "list",
+            name: "HELP",
+            message: "Commander-help: (Opens a browser)",
+            choices: Object.keys(helpOutput),
+            filter: function (val) {
+                return val;
+            }
+        }
+    ];
+    return inquirer.prompt(help);
+};
+
 const getCommand = () => {
     const commands = [
         {
@@ -50,17 +73,6 @@ const getCommand = () => {
             type: "input",
             message: ">"
         }
-        /*
-        {
-            type: "list",
-            name: "PARAMS",
-            message: "Which command would you like to run?",
-            choices: ["nc help", "nc command_create", "nc test", "nc exit"],
-            filter: function (val) {
-                return val;
-            }
-        }
-        */
     ];
     return inquirer.prompt(commands);
 };
@@ -81,11 +93,17 @@ const renderResult = (result) => {
     }
 };
 
-const runCommand = (command) => {
+const runCommand = async (command) => {
     try {
-        if (command === "?") {
-            shell.echo('Help output');
+        if (command === "?" || command === "help") {
+            const { HELP } = await getHelp();
+            console.log(HELP);
+            opn(helpOutput[HELP]);
             return null;
+        }
+
+        if (command.startsWith("/nc")) {
+            command = command.substring(command.indexOf(" ") + 1);
         }
 
         const res = shell.exec(`nim action invoke ` +
@@ -98,7 +116,7 @@ const runCommand = (command) => {
             ` -p syncRequest '"true"' -p text '${command}'` +
             ` -p user_id ${user_id} -p team_id ${team_id}`,
             { silent: true })
-        if (!res) {
+        if (res.code) {
             shell.echo('Error: nim command failed');
             shell.exit(1);
         }
@@ -118,7 +136,7 @@ const run = async () => {
         if (!COMMAND) {
             continue;
         }
-        const result = runCommand(COMMAND);
+        const result = await runCommand(COMMAND);
         renderResult(result);
     }
 };
