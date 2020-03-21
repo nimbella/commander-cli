@@ -37,6 +37,12 @@ const helpOutput = {
     "Quick start on using Commander": "https://nimbella.com/resources-commander/quickstart#quickstart"
 }
 
+const setupAuth = (output) => {
+    auth = output;
+    const secret = auth.split(":");
+    user_id = secret[0], team_id = secret[1];
+}
+
 const init = () => {
     if (!shell.which('nim')) {
         shell.echo('Commander CLI requires nim. ' +
@@ -44,15 +50,6 @@ const init = () => {
             'npm install -g https://apigcp.nimbella.io/nimbella-cli.tgz');
         shell.exit(1);
     }
-
-    const res = shell.exec(`nim auth current --auth`, { silent: true });
-    if (res.code) {
-        shell.echo("Failed to fetch any auth:", res.stdout);
-        shell.exit(1);
-    }
-    auth = res.stdout;
-    const secret = auth.split(":");
-    user_id = secret[0], team_id = secret[1];
 
     console.log(
         chalk.green(
@@ -65,8 +62,15 @@ const init = () => {
     console.log("CLI which allows you to create, run & publish your serverless functions as commands\n");
     const nimbella = terminalLink('Presented to you by Nimbella', 'https://nimbella.com');
     console.log(nimbella);
-    console.log("Your user id: ", user_id);
-    console.log("Your team id: ", team_id);
+
+    const res = shell.exec(`nim auth current --auth`, { silent: true });
+    if (res.code) {
+        shell.echo("Type register to start working on your serverless commands!", res.stdout);
+    } else {
+        setupAuth(res.stdout);
+        console.log("Your user id: ", user_id);
+        console.log("Your team id: ", team_id);
+    }
 }
 
 const getHelp = () => {
@@ -97,6 +101,18 @@ const getCommand = () => {
 
 const renderResult = (result) => {
     if (result) {
+        if (!user_id || !team_id) {
+            if (result.startsWith("Successfully")) {
+                setupAuth(res.stdout);
+                console.log(
+                    chalk.white.bgBlack.bold(
+                        `Successfully registered with Commander\n`)
+                );
+            } else {
+                console.log("Failed to register with commander");
+                shell.exit(1);
+            }
+        }
         let hyperlink = result.substring(
             result.lastIndexOf("<") + 1,
             result.lastIndexOf(">")
@@ -113,6 +129,10 @@ const renderResult = (result) => {
 
 const runCommand = async (command) => {
     try {
+        if ((!user_id || !team_id) && command !== "register") {
+            console.log("Type register to start working on Commander");
+            return null;
+        }
         if (command === "?" || command === "help") {
             const { HELP } = await getHelp();
             console.log(HELP);
@@ -135,9 +155,11 @@ const runCommand = async (command) => {
             ` -p user_id ${user_id} -p team_id ${team_id}`,
             { silent: true })
         if (res.code) {
-            shell.echo('Error: nim command failed');
+            // TODO: Log to a debug file
+            shell.echo('Error: Failed to execute the command');
             shell.exit(1);
         }
+        // TODO: Log stdout to a log file
         return JSON.parse(res.stdout).body.text;
     } catch (e) {
         // TODO: Log to a logfile
