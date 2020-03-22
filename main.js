@@ -29,6 +29,12 @@ let auth = null;
 let user_id = null;
 let team_id = null;
 
+const commandHelpOutput = "Some useful commands\n" +
+    "General control: help    register     app_info\n" +
+    "Command control: command_create <command-name>    command_list    command_info <command-name>\n" +
+    "CSM control: csm_install <command-set>     csm_info <command-set>   csm_update <command-set>\n" +
+    "Log control: app_log     command_log <command-name>  user_log <user-id>\n"
+
 const helpOutput = {
     "What is Commander, what can I do with it?": "https://nimbella.com/resources-commander/overview#what-is-commander",
     "Commander command reference": "https://nimbella.com/resources-commander/reference#command-reference",
@@ -65,7 +71,7 @@ const init = () => {
 
     const res = shell.exec(`nim auth current --auth`, { silent: true });
     if (res.code) {
-        shell.echo("Type register to start working on your serverless commands!", res.stdout);
+        shell.echo("Type register <username> to start working on your serverless commands!", res.stdout);
     } else {
         setupAuth(res.stdout);
         console.log("Your user id: ", user_id);
@@ -73,19 +79,25 @@ const init = () => {
     }
 }
 
-const getHelp = () => {
-    const help = [
-        {
-            type: "list",
-            name: "HELP",
-            message: "Commander-help: (Opens a browser)",
-            choices: Object.keys(helpOutput),
-            filter: function (val) {
-                return val;
+const getHelp = async(command) => {
+    if (command === "help") {
+        const help = [
+            {
+                type: "list",
+                name: "HELP",
+                message: "Commander-help: (Opens a browser)",
+                choices: Object.keys(helpOutput),
+                filter: function (val) {
+                    return val;
+                }
             }
-        }
-    ];
-    return inquirer.prompt(help);
+        ];
+        const {HELP} = await inquirer.prompt(help);
+        console.log(HELP);
+        opn(helpOutput[HELP]);
+    } else {
+        console.log(commandHelpOutput);
+    }
 };
 
 const getCommand = () => {
@@ -93,7 +105,7 @@ const getCommand = () => {
         {
             name: "COMMAND",
             type: "input",
-            message: ">"
+            message: "nc>"
         }
     ];
     return inquirer.prompt(commands);
@@ -134,14 +146,17 @@ const runCommand = async (command) => {
             return null;
         }
         if (command === "?" || command === "help") {
-            const { HELP } = await getHelp();
-            console.log(HELP);
-            opn(helpOutput[HELP]);
+            getHelp(command);
             return null;
         }
 
         if (command.startsWith("/nc")) {
             command = command.substring(command.indexOf(" ") + 1);
+        }
+
+        if (command.startsWith("app_add")) {
+            console.log("Sorry app_add is not supported in the cli mode");
+            return null;
         }
 
         const res = shell.exec(`nim action invoke ` +
