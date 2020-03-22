@@ -152,6 +152,9 @@ const runCommand = async (command) => {
 
         if (command.startsWith("/nc")) {
             command = command.substring(command.indexOf(" ") + 1);
+        } else if (command.startsWith("nim")) {
+            shell.exec(command);
+            return null;
         }
 
         if (command.startsWith("app_add")) {
