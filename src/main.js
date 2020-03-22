@@ -49,6 +49,22 @@ const setupAuth = (output) => {
     user_id = secret[0], team_id = secret[1];
 };
 
+const login = (interactive) => {
+    const res = shell.exec(`nim auth current --auth`, { silent: true });
+    if (res.code) {
+        shell.echo("Type register <username> to start working on your serverless commands!");
+        if (!interactive) {
+            shell.exit(1);
+        }
+    } else {
+        setupAuth(res.stdout);
+        if (interactive) {
+            console.log("Your user id: ", user_id);
+            console.log("Your team id: ", team_id);
+        }
+    }
+};
+
 const init = () => {
     if (!shell.which('nim')) {
         shell.echo('Commander CLI requires nim. ' +
@@ -68,15 +84,7 @@ const init = () => {
     console.log("CLI which allows you to create, run & publish your serverless functions as commands\n");
     const nimbella = terminalLink('Presented to you by Nimbella', 'https://nimbella.com');
     console.log(nimbella);
-
-    const res = shell.exec(`nim auth current --auth`, { silent: true });
-    if (res.code) {
-        shell.echo("Type register <username> to start working on your serverless commands!", res.stdout);
-    } else {
-        setupAuth(res.stdout);
-        console.log("Your user id: ", user_id);
-        console.log("Your team id: ", team_id);
-    }
+    login(true);
 };
 
 const getHelp = async(command) => {
@@ -187,15 +195,22 @@ const runCommand = async (command) => {
 };
 
 const run = async () => {
-    init();
-    while (true) {
-        const command = await getCommand();
-        const { COMMAND } = command;
-        if (!COMMAND) {
-            continue;
-        }
-        const result = await runCommand(COMMAND);
+    const args = process.argv.slice(2);
+    if (args.length) {
+        login(false);
+        const result = await runCommand(args.join(' '));
         renderResult(result);
+    } else {
+        init();
+        while (true) {
+            const command = await getCommand();
+            const { COMMAND } = command;
+            if (!COMMAND) {
+                continue;
+            }
+            const result = await runCommand(COMMAND);
+            renderResult(result);
+        }
     }
 };
 
