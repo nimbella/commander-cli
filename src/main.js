@@ -33,7 +33,7 @@ const commandHelpOutput = "Some useful commands\n" +
     "General control: help    register     app_info\n" +
     "Command control: command_create <command-name>    command_list    command_info <command-name>\n" +
     "CSM control: csm_install <command-set>     csm_info <command-set>   csm_update <command-set>\n" +
-    "Log control: app_log     command_log <command-name>  user_log <user-id>\n"
+    "Log control: app_log     command_log <command-name>  user_log <user-id>\n";
 
 const helpOutput = {
     "What is Commander, what can I do with it?": "https://nimbella.com/resources-commander/overview#what-is-commander",
@@ -41,13 +41,13 @@ const helpOutput = {
     "Creating and deploying custom commands": "https://www.youtube.com/watch?v=HxaLII_IGzY",
     "What are Command-sets and how do I build them?": "https://github.com/nimbella/command-sets",
     "Quick start on using Commander": "https://nimbella.com/resources-commander/quickstart#quickstart"
-}
+};
 
 const setupAuth = (output) => {
     auth = output;
     const secret = auth.split(":");
     user_id = secret[0], team_id = secret[1];
-}
+};
 
 const init = () => {
     if (!shell.which('nim')) {
@@ -77,7 +77,7 @@ const init = () => {
         console.log("Your user id: ", user_id);
         console.log("Your team id: ", team_id);
     }
-}
+};
 
 const getHelp = async(command) => {
     if (command === "help") {
@@ -115,7 +115,7 @@ const renderResult = (result) => {
     if (result) {
         if (!user_id || !team_id) {
             if (result.startsWith("Successfully")) {
-                setupAuth(res.stdout);
+                setupAuth(result);
                 console.log(
                     chalk.white.bgBlack.bold(
                         `Successfully registered with Commander\n`)
@@ -171,7 +171,7 @@ const runCommand = async (command) => {
             ` -p command /nc -p team_domain commander-cli` +
             ` -p syncRequest '"true"' -p text '${command}'` +
             ` -p user_id ${user_id} -p team_id ${team_id}`,
-            { silent: true })
+            { silent: true });
         if (res.code) {
             // TODO: Log to a debug file
             shell.echo('Error: Failed to execute the command');
@@ -184,11 +184,11 @@ const runCommand = async (command) => {
         // console.log(e);
         return "Error (check logs): " + e.message;
     }
-}
+};
 
 const run = async () => {
     init();
-    while (1) {
+    while (true) {
         const command = await getCommand();
         const { COMMAND } = command;
         if (!COMMAND) {
