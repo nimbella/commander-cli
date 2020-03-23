@@ -50,6 +50,15 @@ const helpOutput = {
     "Quick start on using Commander": "https://nimbella.com/resources-commander/quickstart#quickstart"
 };
 
+const isValidUrl = (link) => {
+    try {
+      new URL(link);
+      return true;
+    } catch (_) {
+      return false;
+    }
+};
+
 const setupAuth = (output) => {
     auth = output;
     const secret = auth.split(":");
@@ -144,9 +153,11 @@ const renderResult = (result) => {
             result.lastIndexOf("<") + 1,
             result.lastIndexOf(">")
         );
-        if (hyperlink) {
-           hyperlink = hyperlink.split("|")[0];
-           opn(hyperlink);
+        if (hyperlink && isValidUrl(hyperlink)) {
+            console.log("Opening the default browser..");
+            hyperlink = hyperlink.split("|")[0];
+            opn(hyperlink);
+            return;
         }
         console.log(
             chalk.white.bgBlack.bold(`${result}\n`)
