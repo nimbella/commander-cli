@@ -29,6 +29,13 @@ let auth = null;
 let user_id = null;
 let team_id = null;
 
+const knownCommands = [
+    "run",
+    "help",
+    "--help",
+    "-h"
+];
+
 const commandHelpOutput = "Some useful commands\n" +
     "General control: help    register     app_info\n" +
     "Command control: command_create <command-name>    command_list    command_info <command-name>\n" +
@@ -59,8 +66,8 @@ const login = (interactive) => {
     } else {
         setupAuth(res.stdout);
         if (interactive) {
-            console.log("Your user id: ", user_id);
-            console.log("Your team id: ", team_id);
+            shell.echo("Your user id: ", user_id);
+            shell.echo("Your team id: ", team_id);
         }
     }
 };
@@ -195,8 +202,12 @@ const runCommand = async (command) => {
 };
 
 const run = async () => {
-    const args = process.argv.slice(2);
-    if (args.length) {
+    let args = process.argv.slice(2);
+    if (args.length && !knownCommands.includes(args[0])) {
+        shell.echo("Unknown command");
+        shell.exit(1);
+    } else if (args.length > 1 && args[0] === "run") {
+        args = process.argv.slice(3);
         login(false);
         const result = await runCommand(args.join(' '));
         renderResult(result);
