@@ -21,9 +21,14 @@
 const shell = require("shelljs");
 const chalk = require("chalk");
 
-const firstTimeLogin = (result) => {
-    let userID = null, teamID = null;
+let userID = "ucommandercli";
+let teamID = "tcommandercli";
 
+const isFirstTimeLogin = () => {
+    return userID === "ucommandercli" || teamID === "tcommandercli";
+};
+
+const firstTimeLogin = (result) => {
     if (result.startsWith("Registered successfully with Commander")) {
         const loginAuth = result.split('Auth=')[1];
         const res = shell.exec(`nim auth login --auth=${loginAuth}`, { silent: true });
@@ -40,11 +45,9 @@ const firstTimeLogin = (result) => {
         console.log("Failed to register with Commander");
         shell.exit(1);
     }
-    return [userID, teamID];
 };
 
 const register = (interactive) => {
-    let userID = null, teamID = null;
     const res = shell.exec(`nim auth current --auth`, { silent: true });
     if (res.code) {
         shell.echo("Type register <username> to start working on your serverless commands!");
@@ -59,8 +62,18 @@ const register = (interactive) => {
             shell.echo("Your team id: ", teamID);
         }
     }
-    return [userID, teamID];
+};
+
+const getUser = () => {
+    return userID;
+};
+
+const getTeam = () => {
+    return teamID;
 };
 
 module.exports.register = register;
 module.exports.firstTimeLogin = firstTimeLogin;
+module.exports.getUser = getUser;
+module.exports.getTeam = getTeam;
+module.exports.isFirstTimeLogin = isFirstTimeLogin;

@@ -26,9 +26,6 @@ const figlet = require("figlet");
 const opn = require('opn');
 const terminalLink = require('terminal-link');
 
-let userID = "ccli";
-let teamID = "ccli";
-
 const knownCommands = [
     "run",
     "help",
@@ -48,10 +45,6 @@ const helpOutput = {
     "Creating and deploying custom commands": "https://www.youtube.com/watch?v=HxaLII_IGzY",
     "What are Command-sets and how do I build them?": "https://github.com/nimbella/command-sets",
     "Quick start on using Commander": "https://nimbella.com/resources-commander/quickstart#quickstart"
-};
-
-const isFirstTimeLogin = () => {
-    return userID === "ucli" || teamID === "tcli";
 };
 
 const isValidUrl = (link) => {
@@ -82,7 +75,7 @@ const init = () => {
     console.log("CLI which allows you to create, run & publish your serverless functions as commands\n");
     const nimbella = terminalLink('Presented to you by Nimbella', 'https://nimbella.com');
     console.log(nimbella);
-    [userID, teamID] = login.register(true);
+    login.register(true);
 };
 
 const getHelp = async(command) => {
@@ -119,8 +112,8 @@ const getCommand = () => {
 
 const renderResult = (result) => {
     if (result) {
-        if (isFirstTimeLogin()) {
-            [userID, teamID] = login.firstTimeLogin(result);
+        if (login.isFirstTimeLogin()) {
+            login.firstTimeLogin(result);
         }
         let hyperlink = result.substring(
             result.lastIndexOf("<") + 1,
@@ -140,7 +133,7 @@ const renderResult = (result) => {
 
 const runCommand = async (command) => {
     try {
-        if (isFirstTimeLogin() && command !== "register") {
+        if (login.isFirstTimeLogin() && command !== "register") {
             console.log("Type register to start working on Commander");
             return null;
         }
@@ -169,7 +162,7 @@ const runCommand = async (command) => {
             ` "user-agent": "commander-cli" }'` +
             ` -p command /nc -p team_domain commander-cli` +
             ` -p syncRequest '"true"' -p text '${command}'` +
-            ` -p user_id ${userID} -p team_id ${teamID}`,
+            ` -p user_id ${login.getUser()} -p team_id ${login.getTeam()}`,
             { silent: true });
         if (res.code) {
             // TODO: Log to a debug file
@@ -193,7 +186,7 @@ const run = async () => {
         shell.exit(1);
     } else if (args.length > 1 && args[0] === "run") {
         args = process.argv.slice(3);
-        [userID, teamID] = login.register(false);
+        login.register(false);
         const result = await runCommand(args.join(' '));
         renderResult(result);
     } else {
