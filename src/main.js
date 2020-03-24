@@ -155,8 +155,8 @@ const runCommand = async (command) => {
         }
 
         const res = shell.exec(`nim action invoke ` +
-            `--auth=72c9288f-bb74-4d41-aee0-a20d1539ab07:DMBuq9iZkSw0GDBC1C9PTl04megr3ycSHXr3k21zguP99mtoniNOlFpMDdtBmREF` +
-            ` /nikhilni-5kbaqxyq6lj/portal/gateway ` +
+            `--auth=3d4d42c1-700e-4806-a267-dc633c68d174:f1LSnYE61RuqMuHg4Ac8TlrNBrKjE5C0CO0Q5NQzscmSLOWMCf5jsXUKitgdnCi7` +
+            ` /nc-dev/portal/gateway ` +
             ` --result -p __ow_headers '{"accept": "application/json", ` +
             `"content-type": "application/x-www-form-urlencoded",` +
             ` "user-agent": "commander-cli" }'` +
