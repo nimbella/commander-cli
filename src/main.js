@@ -26,8 +26,8 @@ const figlet = require("figlet");
 const opn = require('opn');
 const terminalLink = require('terminal-link');
 
-let userID = null;
-let teamID = null;
+let userID = "ccli";
+let teamID = "ccli";
 
 const knownCommands = [
     "run",
@@ -48,6 +48,10 @@ const helpOutput = {
     "Creating and deploying custom commands": "https://www.youtube.com/watch?v=HxaLII_IGzY",
     "What are Command-sets and how do I build them?": "https://github.com/nimbella/command-sets",
     "Quick start on using Commander": "https://nimbella.com/resources-commander/quickstart#quickstart"
+};
+
+const isFirstTimeLogin = () => {
+    return userID === "ucli" || teamID === "tcli";
 };
 
 const isValidUrl = (link) => {
@@ -115,7 +119,7 @@ const getCommand = () => {
 
 const renderResult = (result) => {
     if (result) {
-        if (!userID || !teamID) {
+        if (isFirstTimeLogin()) {
             [userID, teamID] = login.firstTimeLogin(result);
         }
         let hyperlink = result.substring(
@@ -136,7 +140,7 @@ const renderResult = (result) => {
 
 const runCommand = async (command) => {
     try {
-        if ((!userID || !teamID) && command !== "register") {
+        if (isFirstTimeLogin() && command !== "register") {
             console.log("Type register to start working on Commander");
             return null;
         }
@@ -165,7 +169,7 @@ const runCommand = async (command) => {
             ` "user-agent": "commander-cli" }'` +
             ` -p command /nc -p team_domain commander-cli` +
             ` -p syncRequest '"true"' -p text '${command}'` +
-            ` -p userID ${userID} -p teamID ${teamID}`,
+            ` -p user_id ${userID} -p team_id ${teamID}`,
             { silent: true });
         if (res.code) {
             // TODO: Log to a debug file
