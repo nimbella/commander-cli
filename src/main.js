@@ -20,14 +20,14 @@
 
 const inquirer = require("inquirer");
 const shell = require("shelljs");
+const login = require('./login');
 const chalk = require("chalk");
 const figlet = require("figlet");
 const opn = require('opn');
 const terminalLink = require('terminal-link');
 
-let auth = null;
-let user_id = null;
-let team_id = null;
+let userID = null;
+let teamID = null;
 
 const knownCommands = [
     "run",
@@ -59,28 +59,6 @@ const isValidUrl = (link) => {
     }
 };
 
-const setupAuth = (output) => {
-    auth = output;
-    const secret = auth.split(":");
-    user_id = secret[0], team_id = secret[1];
-};
-
-const login = (interactive) => {
-    const res = shell.exec(`nim auth current --auth`, { silent: true });
-    if (res.code) {
-        shell.echo("Type register <username> to start working on your serverless commands!");
-        if (!interactive) {
-            shell.exit(1);
-        }
-    } else {
-        setupAuth(res.stdout);
-        if (interactive) {
-            shell.echo("Your user id: ", user_id);
-            shell.echo("Your team id: ", team_id);
-        }
-    }
-};
-
 const init = () => {
     if (!shell.which('nim')) {
         shell.echo('Commander CLI requires nim. ' +
@@ -100,7 +78,7 @@ const init = () => {
     console.log("CLI which allows you to create, run & publish your serverless functions as commands\n");
     const nimbella = terminalLink('Presented to you by Nimbella', 'https://nimbella.com');
     console.log(nimbella);
-    login(true);
+    [userID, teamID] = login.register(true);
 };
 
 const getHelp = async(command) => {
@@ -137,17 +115,8 @@ const getCommand = () => {
 
 const renderResult = (result) => {
     if (result) {
-        if (!user_id || !team_id) {
-            if (result.startsWith("Successfully")) {
-                setupAuth(result);
-                console.log(
-                    chalk.white.bgBlack.bold(
-                        `Successfully registered with Commander\n`)
-                );
-            } else {
-                console.log("Failed to register with commander");
-                shell.exit(1);
-            }
+        if (!userID || !teamID) {
+            [userID, teamID] = login.firstTimeLogin(result);
         }
         let hyperlink = result.substring(
             result.lastIndexOf("<") + 1,
@@ -167,7 +136,7 @@ const renderResult = (result) => {
 
 const runCommand = async (command) => {
     try {
-        if ((!user_id || !team_id) && command !== "register") {
+        if ((!userID || !teamID) && command !== "register") {
             console.log("Type register to start working on Commander");
             return null;
         }
@@ -196,7 +165,7 @@ const runCommand = async (command) => {
             ` "user-agent": "commander-cli" }'` +
             ` -p command /nc -p team_domain commander-cli` +
             ` -p syncRequest '"true"' -p text '${command}'` +
-            ` -p user_id ${user_id} -p team_id ${team_id}`,
+            ` -p userID ${userID} -p teamID ${teamID}`,
             { silent: true });
         if (res.code) {
             // TODO: Log to a debug file
@@ -204,6 +173,7 @@ const runCommand = async (command) => {
             shell.exit(1);
         }
         // TODO: Log stdout to a log file
+        console.log(res.stdout);
         return JSON.parse(res.stdout).body.text;
     } catch (e) {
         // TODO: Log to a logfile
@@ -219,7 +189,7 @@ const run = async () => {
         shell.exit(1);
     } else if (args.length > 1 && args[0] === "run") {
         args = process.argv.slice(3);
-        login(false);
+        [userID, teamID] = login.register(false);
         const result = await runCommand(args.join(' '));
         renderResult(result);
     } else {
