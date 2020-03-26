@@ -47,6 +47,21 @@ const firstTimeLogin = (result) => {
     }
 };
 
+const login = (creds) => {
+    if (!creds) {
+        console.log("No credentials given");
+        return;
+    }
+    const secret = creds.split(":");
+    if (!secret || secret.length !== 2) {
+        console.log("Failed to extract login creds from:", creds);
+        return;
+    }
+    userID = secret[0];
+    teamID = secret[1];
+    console.log("Temporarily using the following creds: ", userID, teamID);
+};
+
 const register = (interactive) => {
     const res = shell.exec(`nim auth current --auth`, { silent: true });
     if (res.code) {
@@ -77,3 +92,4 @@ module.exports.firstTimeLogin = firstTimeLogin;
 module.exports.getUser = getUser;
 module.exports.getTeam = getTeam;
 module.exports.isFirstTimeLogin = isFirstTimeLogin;
+module.exports.login = login;
