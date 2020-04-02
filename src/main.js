@@ -171,6 +171,7 @@ const runCommand = async (command) => {
             { silent: true });
         if (res.code) {
             // TODO: Log to a debug file
+            shell.echo(res.stdout);
             shell.echo('Error: Failed to execute the command');
             shell.exit(1);
         }

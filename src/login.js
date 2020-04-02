@@ -34,6 +34,10 @@ const firstTimeLogin = (result) => {
         const res = shell.exec(`nim auth login --auth=${loginAuth}`, { silent: true });
         if (!res.code) {
             shell.echo(res.output);
+        } else {
+            shell.echo("Failed to login to the namespace");
+            shell.echo(res.output);
+            shell.exit(1);
         }
         const secret = result.split(":");
         userID = secret[0], teamID = secret[1];
@@ -65,7 +69,7 @@ const login = (creds) => {
 const register = (interactive) => {
     const res = shell.exec(`nim auth current --auth`, { silent: true });
     if (res.code) {
-        shell.echo("Type register <username> to start working on your serverless commands!");
+        shell.echo("Type register or login userid:teamid to start working on your serverless commands!");
         if (!interactive) {
             shell.exit(1);
         }
@@ -73,6 +77,8 @@ const register = (interactive) => {
         const secret = res.stdout.split(":");
         userID = secret[0], teamID = secret[1];
         if (interactive) {
+            shell.echo("Your namespace: ",
+             shell.exec(`nim auth current`, { silent: true }));
             shell.echo("Your user id: ", userID);
             shell.echo("Your team id: ", teamID);
         }
