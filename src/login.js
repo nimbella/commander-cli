@@ -39,7 +39,7 @@ const firstTimeLogin = (result) => {
             shell.echo(res.output);
             shell.exit(1);
         }
-        const secret = result.split(":");
+        const secret = loginAuth.split(":");
         userID = secret[0], teamID = secret[1];
         console.log(
             chalk.white.bgBlack.bold(
