@@ -154,8 +154,8 @@ const runCommand = async (command) => {
             return null;
         }
 
-        if (command.startsWith("app_add")) {
-            console.log("Sorry app_add is not supported in the cli mode");
+        if (command.startsWith("app_add") || command.startsWith("app_delete")) {
+            console.log("Sorry app addition/deletion is not supported in the cli mode");
             return null;
         }
 
