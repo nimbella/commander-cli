@@ -160,14 +160,14 @@ const runCommand = async (command) => {
         }
 
         const res = shell.exec(`nim action invoke ` +
-            `--auth=3d4d42c1-700e-4806-a267-dc633c68d174:f1LSnYE61RuqMuHg4Ac8TlrNBrKjE5C0CO0Q5NQzscmSLOWMCf5jsXUKitgdnCi7` +
-            ` /nc-dev/portal/gateway ` +
-            ` --result -p __ow_headers '{"accept": "application/json", ` +
-            `"content-type": "application/x-www-form-urlencoded",` +
-            ` "user-agent": "commander-cli" }'` +
-            ` -p command /nc -p team_domain commander-cli` +
-            ` -p syncRequest '"true"' -p text '${command}'` +
-            ` -p user_id ${login.getUser()} -p team_id ${login.getTeam()}`,
+        `--auth=3d4d42c1-700e-4806-a267-dc633c68d174:f1LSnYE61RuqMuHg4Ac8TlrNBrKjE5C0CO0Q5NQzscmSLOWMCf5jsXUKitgdnCi7` +
+        ` /nc-dev/portal/gateway ` +
+        ` --result -p __ow_headers "{\\"accept\\": \\"application/json\\", ` +
+        `\\"content-type\\": \\"application/x-www-form-urlencoded\\",` +
+        ` \\"user-agent\\": \\"commander-cli\\" }"` +
+        ` -p command /nc -p team_domain commander-cli` +
+        ` -p syncRequest \\"true\\" -p text \\"${command}\\"` +
+        ` -p user_id ${login.getUser()} -p team_id ${login.getTeam()}`,
             { silent: true });
         if (res.code) {
             // TODO: Log to a debug file
