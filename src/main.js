@@ -166,14 +166,13 @@ const runCommand = async (command) => {
         `\\"content-type\\": \\"application/x-www-form-urlencoded\\",` +
         ` \\"user-agent\\": \\"commander-cli\\" }"` +
         ` -p command /nc -p team_domain commander-cli` +
-        ` -p syncRequest \\"true\\" -p text \\"${command}\\"` +
+        ` -p syncRequest \\"true\\" -p text \"${command}\"` +
         ` -p user_id ${login.getUser()} -p team_id ${login.getTeam()}`,
             { silent: true });
         if (res.code) {
             // TODO: Log to a debug file
             shell.echo(res.stdout);
-            shell.echo('Error: Failed to execute the command');
-            shell.exit(1);
+            return "Error: Failed to execute the command";
         }
         // TODO: Log stdout to a log file
         console.log(res.stdout);
