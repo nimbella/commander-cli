@@ -23,6 +23,7 @@ const chalk = require("chalk");
 
 let userID = "ucommandercli";
 let teamID = "tcommandercli";
+const workbenchURL = "https://apigcp.nimbella.io/wb";
 
 const isFirstTimeLogin = () => {
     return userID === "ucommandercli" || teamID === "tcommandercli";
@@ -93,9 +94,20 @@ const getTeam = () => {
     return teamID;
 };
 
+const getAuth = () => {
+    return userID + ":" + teamID;
+};
+
+const getWorkbenchURL = () => {
+    return `${workbenchURL}?command=auth login` +
+    ` --auth=${getAuth()}`;
+};
+
 module.exports.register = register;
 module.exports.firstTimeLogin = firstTimeLogin;
 module.exports.getUser = getUser;
 module.exports.getTeam = getTeam;
+module.exports.getAuth = getAuth;
+module.exports.getWorkbenchURL = getWorkbenchURL;
 module.exports.isFirstTimeLogin = isFirstTimeLogin;
 module.exports.login = login;

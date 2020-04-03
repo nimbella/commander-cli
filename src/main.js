@@ -147,6 +147,11 @@ const runCommand = async (command) => {
             return null;
         }
 
+        if (command === "workbench") {
+            opn(login.getWorkbenchURL());
+            return null;
+        }
+
         if (command.startsWith("/nc")) {
             command = command.substring(command.indexOf(" ") + 1);
         } else if (command.startsWith("nim")) {
