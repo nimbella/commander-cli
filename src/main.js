@@ -23,7 +23,7 @@ const shell = require("shelljs");
 const login = require('./login');
 const chalk = require("chalk");
 const figlet = require("figlet");
-const opn = require('opn');
+const open = require('open');
 const terminalLink = require('terminal-link');
 
 const knownCommands = [
@@ -93,7 +93,7 @@ const getHelp = async(command) => {
         ];
         const {HELP} = await inquirer.prompt(help);
         console.log(HELP);
-        opn(helpOutput[HELP]);
+        open(helpOutput[HELP]);
     } else {
         console.log(commandHelpOutput);
     }
@@ -122,7 +122,7 @@ const renderResult = (result) => {
         if (hyperlink && isValidUrl(hyperlink)) {
             console.log("Opening the default browser..");
             hyperlink = hyperlink.split("|")[0];
-            opn(hyperlink);
+            open(hyperlink);
             return;
         }
         console.log(
@@ -148,7 +148,7 @@ const runCommand = async (command) => {
         }
 
         if (command === "workbench") {
-            opn(login.getWorkbenchURL());
+            open(login.getWorkbenchURL());
             return null;
         }
 
@@ -201,6 +201,7 @@ const run = async () => {
         renderResult(result);
     } else {
         init();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
             const command = await getCommand();
             const { COMMAND } = command;
