@@ -5,7 +5,8 @@
   "main": "src/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint \"**/*.js\" --fix --ignore-pattern node_modules/"
+    "lint": "eslint \"**/*.js\" --fix --ignore-pattern node_modules/",
+    "prelint": "prettier --write \"**/*.{js,md}\""
   },
   "repository": {
     "type": "git",
@@ -27,7 +28,9 @@
     "eslint": "^6.4.0",
     "eslint-config-prettier": "^6.10.1",
     "eslint-plugin-jest": "^22.5.1",
-    "eslint-plugin-prettier": "^3.1.0"
+    "eslint-plugin-prettier": "^3.1.0",
+    "husky": "^4.2.3",
+    "prettier": "^2.0.3"
   },
   "dependencies": {
     "axios": "^0.19.2",
@@ -37,5 +40,10 @@
     "open": "^7.0.3",
     "shelljs": "^0.8.3",
     "terminal-link": "^2.1.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint"
+    }
   }
 }

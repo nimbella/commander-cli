@@ -20,7 +20,9 @@
 #
 
 ---
-extends: eslint:recommended
+extends:
+  - eslint:recommended
+  - prettier
 
 env:
   browser: false
@@ -30,7 +32,7 @@ env:
 
 parserOptions:
   ecmaVersion: 2018
-  sourceType: "module"
+  sourceType: 'module'
   ecmaFeatures:
     jsx: false
     experimentalObjectRestSpread: true
@@ -40,6 +42,7 @@ globals:
   __SERVER__: true
 
 plugins:
+  - prettier
   - jest
 
 rules:
@@ -57,7 +60,6 @@ rules:
   keyword-spacing: 2
 
   # possible errors
-  comma-dangle: 2
   no-cond-assign: 2
   no-console: 0
   no-constant-condition: 2
@@ -101,5 +103,6 @@ rules:
   no-undef: 2
   no-undefined: 2
   no-unused-vars: 2
-  no-use-before-define: [2, "nofunc"]
+  no-use-before-define: [2, 'nofunc']
   no-trailing-spaces: 2
+  prettier/prettier: 2
