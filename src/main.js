@@ -25,6 +25,7 @@ const chalk = require("chalk");
 const figlet = require("figlet");
 const open = require("open");
 const terminalLink = require("terminal-link");
+const renderResult = require("./render");
 
 const knownCommands = ["run", "help", "--help", "-h"];
 
@@ -46,15 +47,6 @@ const helpOutput = {
     "https://github.com/nimbella/command-sets",
   "Quick start on using Commander":
     "https://nimbella.com/resources-commander/quickstart#quickstart",
-};
-
-const isValidUrl = (link) => {
-  try {
-    new URL(link);
-    return true;
-  } catch (_) {
-    return false;
-  }
 };
 
 const init = () => {
@@ -86,7 +78,7 @@ const init = () => {
   login.register(true);
 };
 
-const getHelp = async (command) => {
+const getHelp = async command => {
   if (command === "help") {
     const help = [
       {
@@ -118,26 +110,7 @@ const getCommand = () => {
   return inquirer.prompt(commands);
 };
 
-const renderResult = (result) => {
-  if (result) {
-    if (login.isFirstTimeLogin()) {
-      login.firstTimeLogin(result);
-    }
-    let hyperlink = result.substring(
-      result.lastIndexOf("<") + 1,
-      result.lastIndexOf(">")
-    );
-    if (hyperlink && isValidUrl(hyperlink)) {
-      console.log("Opening the default browser..");
-      hyperlink = hyperlink.split("|")[0];
-      open(hyperlink);
-      return;
-    }
-    console.log(chalk.white.bgBlack.bold(`${result}\n`));
-  }
-};
-
-const runCommand = async (command) => {
+const runCommand = async command => {
   try {
     if (login.isFirstTimeLogin() && command !== "register") {
       console.log("Type register to start working on Commander");
@@ -184,14 +157,15 @@ const runCommand = async (command) => {
         ` -p user_id ${login.getUser()} -p team_id ${login.getTeam()}`,
       { silent: true }
     );
+
     if (res.code) {
       // TODO: Log to a debug file
       shell.echo(res.stdout);
       return "Error: Failed to execute the command";
     }
     // TODO: Log stdout to a log file
-    console.log(res.stdout);
-    return JSON.parse(res.stdout).body.text;
+    // console.log(res.stdout);
+    return res.stdout;
   } catch (e) {
     // TODO: Log to a logfile
     // console.log(e);
