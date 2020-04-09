@@ -29,7 +29,7 @@ const isFirstTimeLogin = () => {
   return userID === "ucommandercli" || teamID === "tcommandercli";
 };
 
-const firstTimeLogin = (result) => {
+const firstTimeLogin = result => {
   if (result.startsWith("Registered successfully with Commander")) {
     const loginAuth = result.split("Auth=")[1];
     const res = shell.exec(`nim auth login --auth=${loginAuth}`, {
@@ -54,7 +54,7 @@ const firstTimeLogin = (result) => {
   }
 };
 
-const login = (creds) => {
+const login = creds => {
   if (!creds) {
     console.log("No credentials given");
     return;
@@ -69,7 +69,7 @@ const login = (creds) => {
   console.log("Temporarily using the following creds: ", userID, teamID);
 };
 
-const register = (interactive) => {
+const register = interactive => {
   const res = shell.exec(`nim auth current --auth`, { silent: true });
   if (res.code) {
     shell.echo(
