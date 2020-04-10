@@ -18,129 +18,85 @@
  * from Nimbella Corp.
  */
 
-const inquirer = require("inquirer");
-const shell = require("shelljs");
-const login = require("./login");
-const chalk = require("chalk");
-const figlet = require("figlet");
-const open = require("open");
-const terminalLink = require("terminal-link");
-const renderResult = require("./render");
-
-const knownCommands = ["run", "help", "--help", "-h"];
-
-const commandHelpOutput =
-  "Some useful commands\n" +
-  "General control: help    register     app_info\n" +
-  "Command control: command_create <command-name>    command_list    command_info <command-name>\n" +
-  "CSM control: csm_install <command-set>     csm_info <command-set>   csm_update <command-set>\n" +
-  "Log control: app_log     command_log <command-name>  user_log <user-id>\n";
-
-const helpOutput = {
-  "What is Commander, what can I do with it?":
-    "https://nimbella.com/resources-commander/overview#what-is-commander",
-  "Commander command reference":
-    "https://nimbella.com/resources-commander/reference#command-reference",
-  "Creating and deploying custom commands":
-    "https://www.youtube.com/watch?v=HxaLII_IGzY",
-  "What are Command-sets and how do I build them?":
-    "https://github.com/nimbella/command-sets",
-  "Quick start on using Commander":
-    "https://nimbella.com/resources-commander/quickstart#quickstart",
-};
+const shell = require('shelljs');
+const chalk = require('chalk');
+const figlet = require('figlet');
+const open = require('open');
+const terminalLink = require('terminal-link');
+const login = require('./login');
+const renderResult = require('./render');
 
 const init = () => {
-  if (!shell.which("nim")) {
-    shell.echo(
-      "Commander CLI requires nim. " +
-        "You can download and install it by running: " +
-        "npm install -g https://apigcp.nimbella.io/nimbella-cli.tgz"
+  if (!shell.which('nim')) {
+    console.log(
+      'Commander CLI requires nim. ' +
+        'You can download and install it by running: ' +
+        'npm install -g https://apigcp.nimbella.io/nimbella-cli.tgz'
     );
-    shell.exit(1);
+    process.exit(1);
   }
 
   console.log(
     chalk.green(
-      figlet.textSync("Commander CLI", {
-        horizontalLayout: "default",
-        verticalLayout: "default",
+      figlet.textSync('Commander CLI', {
+        horizontalLayout: 'default',
+        verticalLayout: 'default',
       })
     )
   );
   console.log(
-    "CLI which allows you to create, run & publish your serverless functions as commands\n"
+    'CLI which allows you to create, run & publish your serverless functions as commands\n'
   );
   const nimbella = terminalLink(
-    "Presented to you by Nimbella",
-    "https://nimbella.com"
+    'Presented to you by Nimbella',
+    'https://nimbella.com'
   );
   console.log(nimbella);
   login.register(true);
 };
 
-const getHelp = async command => {
-  if (command === "help") {
-    const help = [
-      {
-        type: "list",
-        name: "HELP",
-        message: "Commander-help: (Opens a browser)",
-        choices: Object.keys(helpOutput),
-        filter: function (val) {
-          return val;
-        },
-      },
-    ];
-    const { HELP } = await inquirer.prompt(help);
-    console.log(HELP);
-    open(helpOutput[HELP]);
-  } else {
-    console.log(commandHelpOutput);
-  }
-};
+const getHelp = () => {
+  const helpOutput =
+    'Some useful commands\n' +
+    'General control: help    register     app_info\n' +
+    'Command control: command_create <command-name>    command_list    command_info <command-name>\n' +
+    'CSM control: csm_install <command-set>     csm_info <command-set>   csm_update <command-set>\n' +
+    'Log control: app_log     command_log <command-name>  user_log <user-id>\n';
 
-const getCommand = () => {
-  const commands = [
-    {
-      name: "COMMAND",
-      type: "input",
-      message: "nc>",
-    },
-  ];
-  return inquirer.prompt(commands);
+  return helpOutput;
 };
 
 const runCommand = async command => {
   try {
-    if (login.isFirstTimeLogin() && command !== "register") {
-      console.log("Type register to start working on Commander");
+    if (login.isFirstTimeLogin() && command !== 'register') {
+      console.log('Type register to start working on Commander');
       return null;
     }
-    if (command === "?" || command === "help") {
+    if (command === '?' || command === 'help') {
       getHelp(command);
       return null;
     }
 
-    if (command.startsWith("login")) {
-      login.login(command.substring(command.indexOf(" ") + 1));
+    if (command.startsWith('login')) {
+      login.login(command.substring(command.indexOf(' ') + 1));
       return null;
     }
 
-    if (command === "workbench") {
+    if (command === 'workbench') {
       open(login.getWorkbenchURL());
       return null;
     }
 
-    if (command.startsWith("/nc")) {
-      command = command.substring(command.indexOf(" ") + 1);
-    } else if (command.startsWith("nim")) {
+    if (command.startsWith('/nc')) {
+      command = command.substring(command.indexOf(' ') + 1);
+    } else if (command.startsWith('nim')) {
       shell.exec(command);
       return null;
     }
 
-    if (command.startsWith("app_add") || command.startsWith("app_delete")) {
+    if (command.startsWith('app_add') || command.startsWith('app_delete')) {
       console.log(
-        "Sorry app addition/deletion is not supported in the cli mode"
+        'Sorry app addition/deletion is not supported in the cli mode'
       );
       return null;
     }
@@ -161,7 +117,7 @@ const runCommand = async command => {
     if (res.code) {
       // TODO: Log to a debug file
       shell.echo(res.stdout);
-      return "Error: Failed to execute the command";
+      return 'Error: Failed to execute the command';
     }
     // TODO: Log stdout to a log file
     // console.log(res.stdout);
@@ -169,38 +125,65 @@ const runCommand = async command => {
   } catch (e) {
     // TODO: Log to a logfile
     // console.log(e);
-    return "Error (check logs): " + e.message;
+    return 'Error (check logs): ' + e.message;
   }
 };
 
-const run = async () => {
-  let args = process.argv.slice(2);
-  if (args.length && !knownCommands.includes(args[0])) {
-    shell.echo("Unknown command");
-    shell.exit(1);
-  } else if (args.length > 1 && args[0] === "run") {
-    args = process.argv.slice(3);
-    login.register(false);
-    const result = await runCommand(args.join(" "));
-    renderResult(result);
-  } else {
-    init();
-    // eslint-disable-next-line no-constant-condition
-    while (true) {
-      const command = await getCommand();
-      const { COMMAND } = command;
-      if (!COMMAND) {
-        continue;
-      }
-      const result = await runCommand(COMMAND);
+async function main() {
+  const args = process.argv.slice(2);
+  if (args.length > 0) {
+    if (['help', '--help', '-h'].includes(args[0])) {
+      console.log(getHelp());
+      process.exit();
+    } else {
+      login.register(false);
+      const result = await runCommand(args.join(' '));
       renderResult(result);
     }
+  } else {
+    init();
+    const readline = require('readline');
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+      terminal: true,
+      prompt: 'nc> ',
+      removeHistoryDuplicates: true,
+    });
+
+    rl.prompt();
+
+    rl.on('line', async line => {
+      const command = line.trim();
+      switch (command) {
+        case '.exit':
+          process.exit();
+          break;
+        case '':
+          rl.prompt();
+          break;
+        case '.clear':
+          console.clear();
+          break;
+        case 'help':
+        case '?':
+          console.log(getHelp());
+          break;
+        default: {
+          const result = await runCommand(command);
+          renderResult(result);
+          break;
+        }
+      }
+
+      rl.prompt();
+    });
+
+    rl.on('close', () => {
+      console.log('Bye!');
+      process.exit();
+    });
   }
-};
+}
 
-process.on("SIGINT", function () {
-  console.log("Shutting down gracefully");
-  process.exit();
-});
-
-run();
+main().catch(error => console.log(`nc> ${error.message}`));

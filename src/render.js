@@ -1,6 +1,6 @@
-const chalk = require("chalk");
-const marked = require("marked");
-const TerminalRenderer = require("marked-terminal");
+const chalk = require('chalk');
+const marked = require('marked');
+const TerminalRenderer = require('marked-terminal');
 
 marked.setOptions({
   renderer: new TerminalRenderer(),
@@ -9,29 +9,29 @@ marked.setOptions({
 const renderBlockElement = element => {
   const output = [];
   switch (element.type) {
-    case "context": {
+    case 'context': {
       for (const item of element.elements) {
-        output.push(item.text.replace(/\*/g, "**"));
+        output.push(item.text.replace(/\*/g, '**'));
       }
       break;
     }
-    case "section": {
+    case 'section': {
       if (element.fields && element.fields.length > 0) {
         for (const field of element.fields) {
-          output.push(field.text.replace(/\*/g, "**") + "\n");
+          output.push(field.text.replace(/\*/g, '**') + '\n');
         }
       } else if (element.text) {
-        output.push(element.text.text.replace(/\*/g, "**"));
+        output.push(element.text.text.replace(/\*/g, '**'));
       }
       break;
     }
-    case "divider": {
-      output.push("***");
+    case 'divider': {
+      output.push('***');
       break;
     }
   }
 
-  return marked(output.join(" "));
+  return marked(output.join(' '));
 };
 
 const renderText = text => {
@@ -43,12 +43,12 @@ const renderResult = (result = {}) => {
     return result;
   }
 
-  if (result.startsWith("Error")) {
+  if (result.startsWith('Error')) {
     return console.log(result);
   }
 
   const {
-    body: { text = "", attachments = [], blocks = [] },
+    body: { text = '', attachments = [], blocks = [] },
   } = JSON.parse(result);
 
   if (text !== null) {
@@ -71,7 +71,7 @@ const renderResult = (result = {}) => {
     }
   }
 
-  return "";
+  return '';
 };
 
 module.exports = renderResult;
