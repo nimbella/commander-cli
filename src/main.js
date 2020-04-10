@@ -27,28 +27,6 @@ const open = require("open");
 const terminalLink = require("terminal-link");
 const renderResult = require("./render");
 
-const knownCommands = ["run", "help", "--help", "-h"];
-
-const commandHelpOutput =
-  "Some useful commands\n" +
-  "General control: help    register     app_info\n" +
-  "Command control: command_create <command-name>    command_list    command_info <command-name>\n" +
-  "CSM control: csm_install <command-set>     csm_info <command-set>   csm_update <command-set>\n" +
-  "Log control: app_log     command_log <command-name>  user_log <user-id>\n";
-
-const helpOutput = {
-  "What is Commander, what can I do with it?":
-    "https://nimbella.com/resources-commander/overview#what-is-commander",
-  "Commander command reference":
-    "https://nimbella.com/resources-commander/reference#command-reference",
-  "Creating and deploying custom commands":
-    "https://www.youtube.com/watch?v=HxaLII_IGzY",
-  "What are Command-sets and how do I build them?":
-    "https://github.com/nimbella/command-sets",
-  "Quick start on using Commander":
-    "https://nimbella.com/resources-commander/quickstart#quickstart",
-};
-
 const init = () => {
   if (!shell.which("nim")) {
     shell.echo(
@@ -78,25 +56,15 @@ const init = () => {
   login.register(true);
 };
 
-const getHelp = async command => {
-  if (command === "help") {
-    const help = [
-      {
-        type: "list",
-        name: "HELP",
-        message: "Commander-help: (Opens a browser)",
-        choices: Object.keys(helpOutput),
-        filter: function (val) {
-          return val;
-        },
-      },
-    ];
-    const { HELP } = await inquirer.prompt(help);
-    console.log(HELP);
-    open(helpOutput[HELP]);
-  } else {
-    console.log(commandHelpOutput);
-  }
+const getHelp = () => {
+  const helpOutput =
+    "Some useful commands\n" +
+    "General control: help    register     app_info\n" +
+    "Command control: command_create <command-name>    command_list    command_info <command-name>\n" +
+    "CSM control: csm_install <command-set>     csm_info <command-set>   csm_update <command-set>\n" +
+    "Log control: app_log     command_log <command-name>  user_log <user-id>\n";
+
+  return helpOutput;
 };
 
 const getCommand = () => {
@@ -173,16 +141,17 @@ const runCommand = async command => {
   }
 };
 
-const run = async () => {
-  let args = process.argv.slice(2);
-  if (args.length && !knownCommands.includes(args[0])) {
-    shell.echo("Unknown command");
-    shell.exit(1);
-  } else if (args.length > 1 && args[0] === "run") {
-    args = process.argv.slice(3);
-    login.register(false);
-    const result = await runCommand(args.join(" "));
-    renderResult(result);
+async function main() {
+  const args = process.argv.slice(2);
+  if (args.length > 0) {
+    if (["help", "--help", "-h"].includes(args[0])) {
+      console.log(getHelp());
+      process.exit();
+    } else {
+      login.register(false);
+      const result = await runCommand(args.join(" "));
+      renderResult(result);
+    }
   } else {
     init();
     // eslint-disable-next-line no-constant-condition
@@ -196,11 +165,11 @@ const run = async () => {
       renderResult(result);
     }
   }
-};
+}
 
 process.on("SIGINT", function () {
   console.log("Shutting down gracefully");
   process.exit();
 });
 
-run();
+main();
