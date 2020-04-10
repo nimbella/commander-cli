@@ -18,23 +18,22 @@
  * from Nimbella Corp.
  */
 
-const inquirer = require("inquirer");
 const shell = require("shelljs");
-const login = require("./login");
 const chalk = require("chalk");
 const figlet = require("figlet");
 const open = require("open");
 const terminalLink = require("terminal-link");
+const login = require("./login");
 const renderResult = require("./render");
 
 const init = () => {
   if (!shell.which("nim")) {
-    shell.echo(
+    console.log(
       "Commander CLI requires nim. " +
         "You can download and install it by running: " +
         "npm install -g https://apigcp.nimbella.io/nimbella-cli.tgz"
     );
-    shell.exit(1);
+    process.exit(1);
   }
 
   console.log(
@@ -65,17 +64,6 @@ const getHelp = () => {
     "Log control: app_log     command_log <command-name>  user_log <user-id>\n";
 
   return helpOutput;
-};
-
-const getCommand = () => {
-  const commands = [
-    {
-      name: "COMMAND",
-      type: "input",
-      message: "nc>",
-    },
-  ];
-  return inquirer.prompt(commands);
 };
 
 const runCommand = async command => {
@@ -154,22 +142,48 @@ async function main() {
     }
   } else {
     init();
-    // eslint-disable-next-line no-constant-condition
-    while (true) {
-      const command = await getCommand();
-      const { COMMAND } = command;
-      if (!COMMAND) {
-        continue;
+    const readline = require("readline");
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+      terminal: true,
+      prompt: "nc> ",
+      removeHistoryDuplicates: true,
+    });
+
+    rl.prompt();
+
+    rl.on("line", async line => {
+      const command = line.trim();
+      switch (command) {
+        case ".exit":
+          process.exit();
+          break;
+        case "":
+          rl.prompt();
+          break;
+        case ".clear":
+          console.clear();
+          break;
+        case "help":
+        case "?":
+          console.log(getHelp());
+          break;
+        default: {
+          const result = await runCommand(command);
+          renderResult(result);
+          break;
+        }
       }
-      const result = await runCommand(COMMAND);
-      renderResult(result);
-    }
+
+      rl.prompt();
+    });
+
+    rl.on("close", () => {
+      console.log("Bye!");
+      process.exit();
+    });
   }
 }
 
-process.on("SIGINT", function () {
-  console.log("Shutting down gracefully");
-  process.exit();
-});
-
-main();
+main().catch(error => console.log(`nc> ${error.message}`));
