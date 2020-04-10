@@ -18,38 +18,38 @@
  * from Nimbella Corp.
  */
 
-const shell = require("shelljs");
-const chalk = require("chalk");
-const figlet = require("figlet");
-const open = require("open");
-const terminalLink = require("terminal-link");
-const login = require("./login");
-const renderResult = require("./render");
+const shell = require('shelljs');
+const chalk = require('chalk');
+const figlet = require('figlet');
+const open = require('open');
+const terminalLink = require('terminal-link');
+const login = require('./login');
+const renderResult = require('./render');
 
 const init = () => {
-  if (!shell.which("nim")) {
+  if (!shell.which('nim')) {
     console.log(
-      "Commander CLI requires nim. " +
-        "You can download and install it by running: " +
-        "npm install -g https://apigcp.nimbella.io/nimbella-cli.tgz"
+      'Commander CLI requires nim. ' +
+        'You can download and install it by running: ' +
+        'npm install -g https://apigcp.nimbella.io/nimbella-cli.tgz'
     );
     process.exit(1);
   }
 
   console.log(
     chalk.green(
-      figlet.textSync("Commander CLI", {
-        horizontalLayout: "default",
-        verticalLayout: "default",
+      figlet.textSync('Commander CLI', {
+        horizontalLayout: 'default',
+        verticalLayout: 'default',
       })
     )
   );
   console.log(
-    "CLI which allows you to create, run & publish your serverless functions as commands\n"
+    'CLI which allows you to create, run & publish your serverless functions as commands\n'
   );
   const nimbella = terminalLink(
-    "Presented to you by Nimbella",
-    "https://nimbella.com"
+    'Presented to you by Nimbella',
+    'https://nimbella.com'
   );
   console.log(nimbella);
   login.register(true);
@@ -57,46 +57,46 @@ const init = () => {
 
 const getHelp = () => {
   const helpOutput =
-    "Some useful commands\n" +
-    "General control: help    register     app_info\n" +
-    "Command control: command_create <command-name>    command_list    command_info <command-name>\n" +
-    "CSM control: csm_install <command-set>     csm_info <command-set>   csm_update <command-set>\n" +
-    "Log control: app_log     command_log <command-name>  user_log <user-id>\n";
+    'Some useful commands\n' +
+    'General control: help    register     app_info\n' +
+    'Command control: command_create <command-name>    command_list    command_info <command-name>\n' +
+    'CSM control: csm_install <command-set>     csm_info <command-set>   csm_update <command-set>\n' +
+    'Log control: app_log     command_log <command-name>  user_log <user-id>\n';
 
   return helpOutput;
 };
 
 const runCommand = async command => {
   try {
-    if (login.isFirstTimeLogin() && command !== "register") {
-      console.log("Type register to start working on Commander");
+    if (login.isFirstTimeLogin() && command !== 'register') {
+      console.log('Type register to start working on Commander');
       return null;
     }
-    if (command === "?" || command === "help") {
+    if (command === '?' || command === 'help') {
       getHelp(command);
       return null;
     }
 
-    if (command.startsWith("login")) {
-      login.login(command.substring(command.indexOf(" ") + 1));
+    if (command.startsWith('login')) {
+      login.login(command.substring(command.indexOf(' ') + 1));
       return null;
     }
 
-    if (command === "workbench") {
+    if (command === 'workbench') {
       open(login.getWorkbenchURL());
       return null;
     }
 
-    if (command.startsWith("/nc")) {
-      command = command.substring(command.indexOf(" ") + 1);
-    } else if (command.startsWith("nim")) {
+    if (command.startsWith('/nc')) {
+      command = command.substring(command.indexOf(' ') + 1);
+    } else if (command.startsWith('nim')) {
       shell.exec(command);
       return null;
     }
 
-    if (command.startsWith("app_add") || command.startsWith("app_delete")) {
+    if (command.startsWith('app_add') || command.startsWith('app_delete')) {
       console.log(
-        "Sorry app addition/deletion is not supported in the cli mode"
+        'Sorry app addition/deletion is not supported in the cli mode'
       );
       return null;
     }
@@ -117,7 +117,7 @@ const runCommand = async command => {
     if (res.code) {
       // TODO: Log to a debug file
       shell.echo(res.stdout);
-      return "Error: Failed to execute the command";
+      return 'Error: Failed to execute the command';
     }
     // TODO: Log stdout to a log file
     // console.log(res.stdout);
@@ -125,48 +125,48 @@ const runCommand = async command => {
   } catch (e) {
     // TODO: Log to a logfile
     // console.log(e);
-    return "Error (check logs): " + e.message;
+    return 'Error (check logs): ' + e.message;
   }
 };
 
 async function main() {
   const args = process.argv.slice(2);
   if (args.length > 0) {
-    if (["help", "--help", "-h"].includes(args[0])) {
+    if (['help', '--help', '-h'].includes(args[0])) {
       console.log(getHelp());
       process.exit();
     } else {
       login.register(false);
-      const result = await runCommand(args.join(" "));
+      const result = await runCommand(args.join(' '));
       renderResult(result);
     }
   } else {
     init();
-    const readline = require("readline");
+    const readline = require('readline');
     const rl = readline.createInterface({
       input: process.stdin,
       output: process.stdout,
       terminal: true,
-      prompt: "nc> ",
+      prompt: 'nc> ',
       removeHistoryDuplicates: true,
     });
 
     rl.prompt();
 
-    rl.on("line", async line => {
+    rl.on('line', async line => {
       const command = line.trim();
       switch (command) {
-        case ".exit":
+        case '.exit':
           process.exit();
           break;
-        case "":
+        case '':
           rl.prompt();
           break;
-        case ".clear":
+        case '.clear':
           console.clear();
           break;
-        case "help":
-        case "?":
+        case 'help':
+        case '?':
           console.log(getHelp());
           break;
         default: {
@@ -179,8 +179,8 @@ async function main() {
       rl.prompt();
     });
 
-    rl.on("close", () => {
-      console.log("Bye!");
+    rl.on('close', () => {
+      console.log('Bye!');
       process.exit();
     });
   }
