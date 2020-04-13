@@ -34,7 +34,7 @@ const renderBlockElement = element => {
   return marked(output.join(' '));
 };
 
-const renderText = text => {
+const renderText = (text = '') => {
   return marked(text);
 };
 
@@ -67,7 +67,25 @@ const renderResult = (result = {}) => {
         console.log(chalk.bold(attachment.title));
       }
 
-      console.log(renderText(attachment.text));
+      const fieldText = [];
+      for (const field of attachment.fields) {
+        if (field.value && !field.title) {
+          fieldText.push(field.value.replace(/<(.+)\|(.+)>/g, '$2'));
+        }
+
+        if (field.title) {
+          console.log(renderText(field.title));
+          if (field.value) {
+            console.log(renderText(field.value.replace(/<(.+)\|(.+)>/g, '$2')));
+          }
+        }
+      }
+
+      console.log(renderText(fieldText.join('\n')));
+
+      if (attachment.text) {
+        console.log(renderText(attachment.text));
+      }
     }
   }
 
