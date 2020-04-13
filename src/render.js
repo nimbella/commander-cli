@@ -92,7 +92,11 @@ const renderResult = (result = {}) => {
       output.push(formatText(fieldText.join('\n')));
 
       if (attachment.text) {
-        output.push(formatText(attachment.text));
+        if (attachment.color && attachment.color === 'danger') {
+          output.push(chalk.redBright('Error: ') + formatText(attachment.text));
+        } else {
+          output.push(formatText(attachment.text));
+        }
       }
     }
   }
