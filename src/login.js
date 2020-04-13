@@ -21,12 +21,14 @@
 const shell = require('shelljs');
 const chalk = require('chalk');
 
-let userID = 'ucommandercli';
-let teamID = 'tcommandercli';
+const config = require('./utils/config');
 const workbenchURL = 'https://apigcp.nimbella.io/wb';
 
 const isFirstTimeLogin = () => {
-  return userID === 'ucommandercli' || teamID === 'tcommandercli';
+  return (
+    config.get('userID') === 'ucommandercli' ||
+    config.get('teamID') === 'tcommandercli'
+  );
 };
 
 const firstTimeLogin = result => {
@@ -43,8 +45,8 @@ const firstTimeLogin = result => {
       shell.exit(1);
     }
     const secret = loginAuth.split(':');
-    userID = secret[0];
-    teamID = secret[1];
+    config.set('userID', secret[0]);
+    config.set('teamID', secret[1]);
     console.log(
       chalk.white.bgBlack.bold(`Successfully registered with Commander\n`)
     );
@@ -64,9 +66,14 @@ const login = creds => {
     console.log('Failed to extract login creds from:', creds);
     return;
   }
-  userID = secret[0];
-  teamID = secret[1];
-  console.log('Temporarily using the following creds: ', userID, teamID);
+  config.set('userID', secret[0]);
+  config.set('teamID', secret[1]);
+
+  console.log(
+    'Temporarily using the following creds: ',
+    config.get('userID'),
+    config.get('teamID')
+  );
 };
 
 const register = interactive => {
@@ -80,40 +87,43 @@ const register = interactive => {
     }
   } else {
     const secret = res.stdout.split(':');
-    userID = secret[0];
-    teamID = secret[1];
+    config.set('userID', secret[0]);
+    config.set('teamID', secret[1]);
+
     if (interactive) {
       shell.echo(
         'Your namespace: ',
         shell.exec(`nim auth current`, { silent: true })
       );
-      shell.echo('Your user id: ', userID);
-      shell.echo('Your team id: ', teamID);
+      shell.echo('Your user id: ', config.get('userID'));
+      shell.echo('Your team id: ', config.get('teamID'));
     }
   }
 };
 
 const getUser = () => {
-  return userID;
+  return config.get('userID');
 };
 
 const getTeam = () => {
-  return teamID;
+  return config.get('teamID');
 };
 
 const getAuth = () => {
-  return userID + ':' + teamID;
+  return config.get('userID') + ':' + config.get('teamID');
 };
 
 const getWorkbenchURL = () => {
   return `${workbenchURL}?command=auth login` + ` --auth=${getAuth()}`;
 };
 
-module.exports.register = register;
-module.exports.firstTimeLogin = firstTimeLogin;
-module.exports.getUser = getUser;
-module.exports.getTeam = getTeam;
-module.exports.getAuth = getAuth;
-module.exports.getWorkbenchURL = getWorkbenchURL;
-module.exports.isFirstTimeLogin = isFirstTimeLogin;
-module.exports.login = login;
+module.exports = {
+  register,
+  firstTimeLogin,
+  getUser,
+  getTeam,
+  getAuth,
+  getWorkbenchURL,
+  isFirstTimeLogin,
+  login,
+};
