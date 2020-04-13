@@ -6,90 +6,98 @@ marked.setOptions({
   renderer: new TerminalRenderer(),
 });
 
-const renderBlockElement = element => {
-  const output = [];
+const formatBlockElement = element => {
+  const blockOutput = [];
+
   switch (element.type) {
     case 'context': {
       for (const item of element.elements) {
-        output.push(item.text.replace(/\*/g, '**'));
+        blockOutput.push(item.text.replace(/\*/g, '**'));
       }
       break;
     }
     case 'section': {
       if (element.fields && element.fields.length > 0) {
         for (const field of element.fields) {
-          output.push(field.text.replace(/\*/g, '**') + '\n');
+          blockOutput.push(field.text.replace(/\*/g, '**') + '\n');
         }
       } else if (element.text) {
-        output.push(element.text.text.replace(/\*/g, '**'));
+        blockOutput.push(element.text.text.replace(/\*/g, '**'));
       }
       break;
     }
     case 'divider': {
-      output.push('***');
+      blockOutput.push('***');
       break;
     }
   }
 
-  return marked(output.join(' '));
+  return blockOutput.join(' ');
 };
 
-const renderText = (text = '') => {
-  return marked(text);
+const formatText = (text = '') => {
+  return (
+    text
+      // Replace slack date element with actual date.
+      // Ex: replaces <!date...|13 Apr> with "13 Apr"
+      .replace(/<(!.+)\|(.+)>/g, '$2')
+      // Replace slack link element with actual http link.
+      // Ex: replaces <https://github.com| Github.com> with "https://github.com"
+      .replace(/<(.+)\|(.+)>/g, '$1')
+      .trim()
+  );
 };
 
 const renderResult = (result = {}) => {
-  if (result === null) {
-    return result;
-  }
+  const output = [];
 
-  if (result.startsWith('Error')) {
-    return console.log(result);
+  if (result === null) {
+    return '';
   }
 
   const {
     body: { text = '', attachments = [], blocks = [] },
   } = JSON.parse(result);
 
-  if (text !== null) {
-    console.log(renderText(text));
+  if (text) {
+    output.push(formatText(text));
   }
 
   if (blocks) {
     for (const element of blocks) {
-      console.log(renderBlockElement(element));
+      output.push(formatBlockElement(element));
     }
   }
 
   if (attachments) {
     for (const attachment of attachments) {
-      if (attachment.title !== null) {
-        console.log(chalk.bold(attachment.title));
+      if (attachment.title) {
+        output.push(chalk.bold(attachment.title));
       }
 
       const fieldText = [];
       for (const field of attachment.fields) {
         if (field.value && !field.title) {
-          fieldText.push(field.value.replace(/<(.+)\|(.+)>/g, '$2'));
+          fieldText.push(field.value);
         }
 
         if (field.title) {
-          console.log(renderText(field.title));
+          output.push(formatText(field.title));
           if (field.value) {
-            console.log(renderText(field.value.replace(/<(.+)\|(.+)>/g, '$2')));
+            output.push(formatText(field.value));
           }
         }
       }
 
-      console.log(renderText(fieldText.join('\n')));
+      output.push(formatText(fieldText.join('\n')));
 
       if (attachment.text) {
-        console.log(renderText(attachment.text));
+        output.push(formatText(attachment.text));
       }
     }
   }
 
-  return '';
+  return marked(output.join('\n')).trim();
 };
 
 module.exports = renderResult;

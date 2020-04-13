@@ -171,7 +171,8 @@ async function main() {
           break;
         default: {
           const result = await runCommand(command);
-          renderResult(result);
+          const output = renderResult(result);
+          console.log(output);
           break;
         }
       }
