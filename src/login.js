@@ -88,15 +88,15 @@ const register = interactive => {
   } else {
     const secret = res.stdout.split(':');
     config.set('userID', secret[0]);
-    config.set('teamID', secret[1]);
+    config.set('teamID', secret[1].trim());
 
     if (interactive) {
-      shell.echo(
-        'Your namespace: ',
-        shell.exec(`nim auth current`, { silent: true })
-      );
       shell.echo('Your user id: ', config.get('userID'));
       shell.echo('Your team id: ', config.get('teamID'));
+      shell.echo(
+        'Your namespace: ',
+        shell.exec(`nim auth current`, { silent: true }).trim()
+      );
     }
   }
 };
@@ -113,6 +113,11 @@ const getAuth = () => {
   return config.get('userID') + ':' + config.get('teamID');
 };
 
+const getNs = () => {
+  const res = shell.exec(`nim auth current`, { silent: true });
+  return res.code ? null : res.stdout.trim();
+};
+
 const getWorkbenchURL = () => {
   return `${workbenchURL}?command=auth login` + ` --auth=${getAuth()}`;
 };
@@ -123,6 +128,7 @@ module.exports = {
   getUser,
   getTeam,
   getAuth,
+  getNs,
   getWorkbenchURL,
   isFirstTimeLogin,
   login,
