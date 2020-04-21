@@ -177,6 +177,18 @@ async function main() {
           break;
         default: {
           const result = await runCommand(command);
+
+          const browserDependentCommands = [
+            'command_create',
+            'command_code',
+            'secret_create',
+          ];
+
+          if (browserDependentCommands.includes(command.split(/\s/)[0])) {
+            const link = JSON.parse(result).body.text.match(/<(.+)\|(.+)>/)[1];
+            await open(link);
+          }
+
           const output = renderResult(result);
           console.log(output);
           break;
