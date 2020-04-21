@@ -186,7 +186,7 @@ async function main() {
 
           if (browserDependentCommands.includes(command.split(/\s/)[0])) {
             const link = JSON.parse(result).body.text.match(/<(.+)\|(.+)>/)[1];
-            console.log('Opening your defualt browser...');
+            console.log('Opening your default browser...');
             await open(link);
           } else {
             const output = renderResult(result);
