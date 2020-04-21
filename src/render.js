@@ -75,21 +75,23 @@ const renderResult = (result = {}) => {
         output.push(chalk.bold(attachment.title));
       }
 
-      const fieldText = [];
-      for (const field of attachment.fields) {
-        if (field.value && !field.title) {
-          fieldText.push(field.value);
-        }
+      if (attachment.fields) {
+        const fieldText = [];
+        for (const field of attachment.fields) {
+          if (field.value && !field.title) {
+            fieldText.push(field.value);
+          }
 
-        if (field.title) {
-          output.push(formatText(field.title));
-          if (field.value) {
-            output.push(formatText(field.value));
+          if (field.title) {
+            output.push(formatText(field.title));
+            if (field.value) {
+              output.push(formatText(field.value));
+            }
           }
         }
-      }
 
-      output.push(formatText(fieldText.join('\n')));
+        output.push(formatText(fieldText.join('\n')));
+      }
 
       if (attachment.text) {
         if (attachment.color && attachment.color === 'danger') {

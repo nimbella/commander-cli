@@ -141,17 +141,30 @@ const runCommand = async command => {
     );
 
     if (res.code) {
-      // TODO: Log to a debug file
-      shell.echo(res.stdout);
-      return 'Error: Failed to execute the command';
+      return JSON.stringify({
+        body: {
+          attachments: [
+            {
+              color: 'danger',
+              text: res.stderr,
+            },
+          ],
+        },
+      });
     }
-    // TODO: Log stdout to a log file
-    // console.log(res.stdout);
+
     return res.stdout;
-  } catch (e) {
-    // TODO: Log to a logfile
-    // console.log(e);
-    return 'Error (check logs): ' + e.message;
+  } catch (error) {
+    return JSON.stringify({
+      body: {
+        attachments: [
+          {
+            color: 'danger',
+            text: error.message,
+          },
+        ],
+      },
+    });
   }
 };
 
