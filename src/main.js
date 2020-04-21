@@ -29,7 +29,7 @@ const renderResult = require('./render');
 const init = () => {
   if (!shell.which('nim')) {
     console.log(
-      'Commander CLI requires nim. You can download it by following the instructions at https://nimbella.io/downloads/nim/nim.html'
+      'Commander CLI requires nim. You can install it by following the instructions at https://nimbella.io/downloads/nim/nim.html#install-the-nimbella-command-line-tool-nim'
     );
     process.exit(1);
   }
