@@ -29,9 +29,7 @@ const renderResult = require('./render');
 const init = () => {
   if (!shell.which('nim')) {
     console.log(
-      'Commander CLI requires nim. ' +
-        'You can download and install it by running: ' +
-        'npm install -g https://apigcp.nimbella.io/nimbella-cli.tgz'
+      'Commander CLI requires nim. You can download it by following the instructions at https://nimbella.io/downloads/nim/nim.html'
     );
     process.exit(1);
   }
@@ -105,7 +103,7 @@ const runCommand = async command => {
     }
 
     if (command === 'register' && (ns = login.getNs())) {
-      misc_data = Object.assign(misc_data, {'"namespace"': `"${ns}"`});
+      misc_data = Object.assign(misc_data, { '"namespace"': `"${ns}"` });
     }
     misc_data = JSON.stringify(misc_data);
 
