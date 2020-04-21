@@ -59,10 +59,10 @@ const getHelp = () => {
     `A CLI to interact with Commander from your terminal.`,
     '', // Empty line
     `${chalk.bold('USAGE')}`,
-    `$ ${chalk.green('nc')} - launch Commander REPL`,
-    `$ ${chalk.green('nc help')} - display help for Commander CLI.`,
+    `$ ${chalk.green('ncc')} - launch Commander REPL`,
+    `$ ${chalk.green('ncc help')} - display help for Commander CLI.`,
     `$ ${chalk.green(
-      'nc <command> [command_params/command_options]'
+      'ncc <command> [command_params/command_options]'
     )} - run commander commands`,
     '', // Empty line
     `${chalk.bold('REPL Commands')}`,
@@ -190,9 +190,6 @@ async function main() {
           break;
         case '.clear':
           console.clear();
-          break;
-        case 'write':
-          process.stdout.write('coolshit\n');
           break;
         case '.help':
         case '?':
