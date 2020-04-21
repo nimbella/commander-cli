@@ -29,7 +29,7 @@ const renderResult = require('./render');
 const init = () => {
   if (!shell.which('nim')) {
     console.log(
-      'Commander CLI requires nim. You can download it by following the instructions at https://nimbella.io/downloads/nim/nim.html'
+      'Commander CLI requires nim. You can install it by following the instructions at https://nimbella.io/downloads/nim/nim.html#install-the-nimbella-command-line-tool-nim'
     );
     process.exit(1);
   }
@@ -177,8 +177,21 @@ async function main() {
           break;
         default: {
           const result = await runCommand(command);
-          const output = renderResult(result);
-          console.log(output);
+
+          const browserDependentCommands = [
+            'command_create',
+            'command_code',
+            'secret_create',
+          ];
+
+          if (browserDependentCommands.includes(command.split(/\s/)[0])) {
+            const link = JSON.parse(result).body.text.match(/<(.+)\|(.+)>/)[1];
+            console.log('Opening your default browser...');
+            await open(link);
+          } else {
+            const output = renderResult(result);
+            console.log(output);
+          }
           break;
         }
       }
