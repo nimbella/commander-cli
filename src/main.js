@@ -186,11 +186,12 @@ async function main() {
 
           if (browserDependentCommands.includes(command.split(/\s/)[0])) {
             const link = JSON.parse(result).body.text.match(/<(.+)\|(.+)>/)[1];
+            console.log('Opening your defualt browser...');
             await open(link);
+          } else {
+            const output = renderResult(result);
+            console.log(output);
           }
-
-          const output = renderResult(result);
-          console.log(output);
           break;
         }
       }
