@@ -54,14 +54,34 @@ const init = () => {
 };
 
 const getHelp = () => {
-  const helpOutput =
-    'Some useful commands\n' +
-    'General control: help    register     app_info\n' +
-    'Command control: command_create <command-name>    command_list    command_info <command-name>\n' +
-    'CSM control: csm_install <command-set>     csm_info <command-set>   csm_update <command-set>\n' +
-    'Log control: app_log     command_log <command-name>  user_log <user-id>\n';
+  const helpOutput = [
+    `${chalk.bold('Commander CLI')}`,
+    `A CLI to interact with Commander from your terminal.`,
+    '', // Empty line
+    `${chalk.bold('USAGE')}`,
+    `$ ${chalk.green('nc')} - launch Commander REPL`,
+    `$ ${chalk.green('nc help')} - display help for Commander CLI.`,
+    `$ ${chalk.green(
+      'nc <command> [command_params/command_options]'
+    )} - run commander commands`,
+    '', // Empty line
+    `${chalk.bold('REPL Commands')}`,
+    `${chalk.green('.exit')} - exit the repl`,
+    `${chalk.green('.clear')} - clear the repl`,
+    `${chalk.green('.help')} - display help in repl`,
+    '', // Empty line
+    `${chalk.bold('Commander Commands')}`,
+    `${chalk.green(
+      'command_create <command> [<parameters>] ...'
+    )} - Creates a command & opens online source editor`,
+    `${chalk.green(
+      'csm_install <command-set> ...'
+    )} - Install from Nimbella Command Set Registry: https://github.com/nimbella/command-sets`,
+    '', // Empty line
+    `Please refer https://nimbella.com/resources-commander/reference to learn about Commander commands.`,
+  ];
 
-  return helpOutput;
+  return helpOutput.join('\n');
 };
 
 const runCommand = async command => {
@@ -144,7 +164,7 @@ async function main() {
     } else {
       login.register(false);
       const result = await runCommand(args.join(' '));
-      renderResult(result);
+      console.log(renderResult(result));
     }
   } else {
     init();
@@ -171,7 +191,10 @@ async function main() {
         case '.clear':
           console.clear();
           break;
-        case 'help':
+        case 'write':
+          process.stdout.write('coolshit\n');
+          break;
+        case '.help':
         case '?':
           console.log(getHelp());
           break;
