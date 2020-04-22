@@ -23,6 +23,7 @@ const chalk = require('chalk');
 const figlet = require('figlet');
 const open = require('open');
 const terminalLink = require('terminal-link');
+const { prompt } = require('inquirer');
 const login = require('./login');
 const renderResult = require('./render');
 
@@ -83,6 +84,31 @@ const getHelp = () => {
 
   return helpOutput.join('\n');
 };
+
+const commanderHelp = [
+  {
+    name: 'What is Commander, what can I do with it?',
+    value:
+      'https://nimbella.com/resources-commander/overview#what-is-commander',
+  },
+  {
+    name: 'Commander command reference',
+    value:
+      'https://nimbella.com/resources-commander/reference#command-reference',
+  },
+  {
+    name: 'Creating and deploying custom commands',
+    value: 'https://www.youtube.com/watch?v=HxaLII_IGzY',
+  },
+  {
+    name: 'What are Command-sets and how do I build them?',
+    value: 'https://github.com/nimbella/command-sets',
+  },
+  {
+    name: 'Quick start on using Commander',
+    value: 'https://nimbella.com/resources-commander/quickstart#quickstart',
+  },
+];
 
 const runCommand = async command => {
   let misc_data = {};
@@ -168,6 +194,18 @@ const runCommand = async command => {
   }
 };
 
+async function getCommand() {
+  const { command } = await prompt([
+    {
+      type: 'input',
+      name: 'command',
+      message: 'nc>',
+    },
+  ]);
+
+  return command;
+}
+
 async function main() {
   const args = process.argv.slice(2);
   if (args.length > 0) {
@@ -181,26 +219,16 @@ async function main() {
     }
   } else {
     init();
-    const readline = require('readline');
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-      terminal: true,
-      prompt: 'nc> ',
-      removeHistoryDuplicates: true,
-    });
 
-    rl.prompt();
-
-    rl.on('line', async line => {
-      const command = line.trim();
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      const command = await getCommand();
       switch (command) {
         case '.exit':
           process.exit();
           break;
         case '':
-          rl.prompt();
-          break;
+          continue;
         case '.clear':
           console.clear();
           break;
@@ -208,6 +236,21 @@ async function main() {
         case '?':
           console.log(getHelp());
           break;
+        case 'help': {
+          const { link } = await prompt({
+            type: 'list',
+            name: 'link',
+            message: 'Commander Help (Opens in browser)',
+            choices: [...commanderHelp, { name: 'Exit prompt', value: 'exit' }],
+          });
+
+          if (link === 'exit') {
+            continue;
+          } else {
+            await open(link);
+          }
+          break;
+        }
         default: {
           const result = await runCommand(command);
 
@@ -228,14 +271,7 @@ async function main() {
           break;
         }
       }
-
-      rl.prompt();
-    });
-
-    rl.on('close', () => {
-      console.log('Bye!');
-      process.exit();
-    });
+    }
   }
 }
 
