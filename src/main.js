@@ -23,9 +23,21 @@ const chalk = require('chalk');
 const figlet = require('figlet');
 const open = require('open');
 const terminalLink = require('terminal-link');
-const { prompt } = require('inquirer');
+const inquirer = require('inquirer');
+const inquirerCommandPrompt = require('inquirer-command-prompt');
+const path = require('path');
 const login = require('./login');
 const renderResult = require('./render');
+const config = require('./utils/config');
+
+inquirerCommandPrompt.setConfig({
+  history: {
+    save: true,
+    folder: path.dirname(config.path),
+    limit: 20,
+  },
+});
+inquirer.registerPrompt('command', inquirerCommandPrompt);
 
 const init = () => {
   if (!shell.which('nim')) {
@@ -195,9 +207,9 @@ const runCommand = async command => {
 };
 
 async function getCommand() {
-  const { command } = await prompt([
+  const { command } = await inquirer.prompt([
     {
-      type: 'input',
+      type: 'command',
       name: 'command',
       message: 'nc>',
     },
@@ -237,7 +249,7 @@ async function main() {
           console.log(getHelp());
           break;
         case 'help': {
-          const { link } = await prompt({
+          const { link } = await inquirer.prompt({
             type: 'list',
             name: 'link',
             message: 'Commander Help (Opens in browser)',
