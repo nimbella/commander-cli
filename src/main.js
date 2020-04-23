@@ -173,7 +173,6 @@ const runCommand = async command => {
     const __ow_headers = {
       accept: 'application/json',
       'content-type': 'application/x-www-form-urlencoded',
-      'user-agent': 'commander-cli',
     };
     const messageBody = {
       command: '/nc',
@@ -185,7 +184,10 @@ const runCommand = async command => {
       text: command,
     };
 
-    const subject = Object.assign({ __ow_headers: __ow_headers }, messageBody);
+    const subject = Object.assign(
+      { __ow_headers: __ow_headers, 'user-agent': 'commander-cli' },
+      messageBody
+    );
     const res = await axios.post(gateway, messageBody, {
       headers: subject,
       auth: {
