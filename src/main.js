@@ -29,6 +29,7 @@ const path = require('path');
 const login = require('./login');
 const renderResult = require('./render');
 const config = require('./utils/config');
+const { replCommands, commanderCommands } = require('./utils/commands');
 
 inquirerCommandPrompt.setConfig({
   history: {
@@ -212,6 +213,27 @@ async function getCommand() {
       type: 'command',
       name: 'command',
       message: 'nc>',
+      autoCompletion: line => {
+        if (line.startsWith('/nc')) {
+          const modified = [];
+          for (let i = 0; i < commanderCommands.length; i++) {
+            modified[i] = '/nc ' + commanderCommands[i];
+          }
+
+          return modified;
+        }
+
+        if (line.startsWith('nc')) {
+          const modified = [];
+          for (let i = 0; i < commanderCommands.length; i++) {
+            modified[i] = 'nc ' + commanderCommands[i];
+          }
+
+          return modified;
+        }
+
+        return [...replCommands, ...commanderCommands];
+      },
     },
   ]);
 
