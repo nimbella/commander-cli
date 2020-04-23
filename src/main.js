@@ -30,6 +30,8 @@ const login = require('./login');
 const renderResult = require('./render');
 const config = require('./utils/config');
 const { replCommands, commanderCommands } = require('./utils/commands');
+const axios = require('axios');
+const gateway = 'https://apigcp.nimbella.io/api/v1/web/nc-dev/portal/gateway';
 
 inquirerCommandPrompt.setConfig({
   history: {
@@ -166,20 +168,32 @@ const runCommand = async command => {
     }
     misc_data = JSON.stringify(misc_data);
 
-    const res = shell.exec(
-      `nim action invoke ` +
-        `--auth=3d4d42c1-700e-4806-a267-dc633c68d174:f1LSnYE61RuqMuHg4Ac8TlrNBrKjE5C0CO0Q5NQzscmSLOWMCf5jsXUKitgdnCi7` +
-        ` /nc-dev/portal/gateway ` +
-        ` --result -p __ow_headers "{\\"accept\\": \\"application/json\\", ` +
-        `\\"content-type\\": \\"application/x-www-form-urlencoded\\",` +
-        ` \\"user-agent\\": \\"commander-cli\\" }"` +
-        ` -p command /nc -p team_domain commander-cli` +
-        ` -p syncRequest \\"true\\" -p text \"${command}\"` +
-        ` -p user_id ${login.getUser()} -p team_id ${login.getTeam()} -p misc "${misc_data}"`,
-      { silent: true }
-    );
+    const __ow_headers = {
+      accept: 'application/json',
+      'content-type': 'application/x-www-form-urlencoded',
+      'user-agent': 'commander-cli',
+    };
+    const messageBody = {
+      command: '/nc',
+      team_domain: 'commander-cli',
+      syncRequest: 'true',
+      user_id: login.getUser(),
+      team_id: login.getTeam(),
+      misc: misc_data,
+      text: command,
+    };
 
-    if (res.code) {
+    const subject = Object.assign({ __ow_headers: __ow_headers }, messageBody);
+    const res = await axios.post(gateway, messageBody, {
+      headers: subject,
+      auth: {
+        username: '3d4d42c1-700e-4806-a267-dc633c68d174',
+        password:
+          'f1LSnYE61RuqMuHg4Ac8TlrNBrKjE5C0CO0Q5NQzscmSLOWMCf5jsXUKitgdnCi7',
+      },
+    });
+
+    if (res.status !== 200) {
       return JSON.stringify({
         body: {
           attachments: [
@@ -192,7 +206,7 @@ const runCommand = async command => {
       });
     }
 
-    return res.stdout;
+    return res.data;
   } catch (error) {
     return JSON.stringify({
       body: {
