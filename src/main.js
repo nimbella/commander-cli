@@ -302,6 +302,12 @@ async function main() {
         default: {
           const result = await runCommand(command);
 
+          if (result.attachments && result.attachments[0].color === 'danger') {
+            const output = renderResult(result);
+            console.log(output);
+            continue;
+          }
+
           const browserDependentCommands = [
             'command_create',
             'command_code',
@@ -309,9 +315,11 @@ async function main() {
           ];
 
           if (browserDependentCommands.includes(command.split(/\s/)[0])) {
-            const link = JSON.parse(result).body.text.match(/<(.+)\|(.+)>/)[1];
-            console.log('Opening your default browser...');
-            await open(link);
+            const link = result.text.match(/<(.+)\|(.+)>/)[1];
+            if (link) {
+              console.log('Opening your default browser...');
+              await open(link);
+            }
           } else {
             const output = renderResult(result);
             console.log(output);
