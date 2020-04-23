@@ -18,6 +18,8 @@
  * from Nimbella Corp.
  */
 
+const path = require('path');
+
 const shell = require('shelljs');
 const chalk = require('chalk');
 const figlet = require('figlet');
@@ -25,12 +27,12 @@ const open = require('open');
 const terminalLink = require('terminal-link');
 const inquirer = require('inquirer');
 const inquirerCommandPrompt = require('inquirer-command-prompt');
-const path = require('path');
+const axios = require('axios');
+
 const login = require('./login');
 const renderResult = require('./render');
 const config = require('./utils/config');
 const { replCommands, commanderCommands } = require('./utils/commands');
-const axios = require('axios');
 const gateway = 'https://apigcp.nimbella.io/api/v1/web/nc-dev/portal/gateway';
 
 inquirerCommandPrompt.setConfig({
@@ -194,30 +196,26 @@ const runCommand = async command => {
     });
 
     if (res.status !== 200) {
-      return JSON.stringify({
-        body: {
-          attachments: [
-            {
-              color: 'danger',
-              text: res.stderr,
-            },
-          ],
-        },
-      });
+      return {
+        attachments: [
+          {
+            color: 'danger',
+            text: res.data.text || res.statusText,
+          },
+        ],
+      };
     }
 
     return res.data;
   } catch (error) {
-    return JSON.stringify({
-      body: {
-        attachments: [
-          {
-            color: 'danger',
-            text: error.message,
-          },
-        ],
-      },
-    });
+    return {
+      attachments: [
+        {
+          color: 'danger',
+          text: error.message,
+        },
+      ],
+    };
   }
 };
 
