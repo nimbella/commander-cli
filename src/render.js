@@ -55,9 +55,7 @@ const renderResult = (result = {}) => {
     return '';
   }
 
-  const {
-    body: { text = '', attachments = [], blocks = [] },
-  } = JSON.parse(result);
+  const { text = '', attachments = [], blocks = [] } = result;
 
   if (text) {
     output.push(formatText(text));
