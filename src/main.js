@@ -200,7 +200,7 @@ const runCommand = async command => {
         attachments: [
           {
             color: 'danger',
-            text: res.data.text || res.statusText,
+            text: res.data.error || res.statusText,
           },
         ],
       };
