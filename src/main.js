@@ -33,7 +33,8 @@ const login = require('./login');
 const renderResult = require('./render');
 const config = require('./utils/config');
 const { replCommands, commanderCommands } = require('./utils/commands');
-const gateway = 'https://apigcp.nimbella.io/api/v1/web/nc-dev/portal/gateway';
+const gateway =
+  'https://apigcp.nimbella.io/api/v1/web/nc-dev/portal/cli-gateway';
 
 inquirerCommandPrompt.setConfig({
   history: {
@@ -191,9 +192,8 @@ const runCommand = async command => {
     const res = await axios.post(gateway, messageBody, {
       headers: subject,
       auth: {
-        username: '3d4d42c1-700e-4806-a267-dc633c68d174',
-        password:
-          'f1LSnYE61RuqMuHg4Ac8TlrNBrKjE5C0CO0Q5NQzscmSLOWMCf5jsXUKitgdnCi7',
+        username: login.getPlatformUser(),
+        password: login.getPlatformPassword(),
       },
     });
 
@@ -233,7 +233,6 @@ async function getCommand() {
           for (let i = 0; i < commanderCommands.length; i++) {
             modified[i] = '/nc ' + commanderCommands[i];
           }
-
           return modified;
         }
 
@@ -242,7 +241,6 @@ async function getCommand() {
           for (let i = 0; i < commanderCommands.length; i++) {
             modified[i] = 'nc ' + commanderCommands[i];
           }
-
           return modified;
         }
 

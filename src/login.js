@@ -89,6 +89,8 @@ const register = interactive => {
     const secret = res.stdout.split(':');
     config.set('userID', secret[0]);
     config.set('teamID', secret[1].trim());
+    config.set('platformUser', secret[0]);
+    config.set('platformPassword', secret[1].trim());
 
     if (interactive) {
       shell.echo('Your user id: ', config.get('userID'));
@@ -122,9 +124,19 @@ const getWorkbenchURL = () => {
   return `${workbenchURL}?command=auth login` + ` --auth=${getAuth()}`;
 };
 
+const getPlatformUser = () => {
+  return config.get('platformUser');
+};
+
+const getPlatformPassword = () => {
+  return config.get('platformPassword');
+};
+
 module.exports = {
   register,
   firstTimeLogin,
+  getPlatformUser,
+  getPlatformPassword,
   getUser,
   getTeam,
   getAuth,
