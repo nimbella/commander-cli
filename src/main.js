@@ -242,6 +242,27 @@ const runCommand = async command => {
     clearInterval(loader);
     process.stdout.clearLine();
     process.stdout.cursorTo(0);
+
+    if (command.startsWith('api_get')) {
+      const data = JSON.parse(res.data.text);
+
+      console.log(JSON.stringify(data, null, 2));
+      console.log(`\nYou can invoke the command using cURL:\n`);
+
+      const { params, __secrets, commandText } = data;
+      console.log(
+        `curl -H "Content-Type: application/json" --user "${data.auth[0]}:${
+          data.auth[1]
+        }" --data '${JSON.stringify({
+          params,
+          __secrets,
+          commandText,
+        })}' -X POST ${data.url}`
+      );
+
+      return '';
+    }
+
     return res.data;
   } catch (error) {
     return {
