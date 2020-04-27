@@ -128,6 +128,15 @@ const commanderHelp = [
   },
 ];
 
+const twirlTimer = () => {
+  const patterns = ['\\', '|', '/', '-'];
+  var x = 0;
+  return setInterval(() => {
+    process.stdout.write('\r' + patterns[x++]);
+    x &= 3;
+  }, 250);
+};
+
 const runCommand = async command => {
   let misc_data = {};
   let ns = null;
@@ -185,6 +194,7 @@ const runCommand = async command => {
       text: command,
     };
 
+    const loader = twirlTimer();
     const subject = Object.assign(
       { __ow_headers: __ow_headers, 'user-agent': 'commander-cli' },
       messageBody
@@ -207,7 +217,9 @@ const runCommand = async command => {
         ],
       };
     }
-
+    clearInterval(loader);
+    process.stdout.clearLine();
+    process.stdout.cursorTo(0);
     return res.data;
   } catch (error) {
     return {
