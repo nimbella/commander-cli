@@ -45,6 +45,19 @@ inquirerCommandPrompt.setConfig({
 });
 inquirer.registerPrompt('command', inquirerCommandPrompt);
 
+const checkToken = () => {
+  const res = shell.exec('nim auth current --auth', { silent: true });
+  if (res.code) {
+    console.log("Couldn't verify if the user credentials of nim match");
+  }
+
+  const { username, password } = login.getUserCreds();
+  if (res.stdout.trim() !== `${username}:${password}`) {
+    const token = res.stdout.trim().split(':');
+    login.setUserCreds(token[0], token[1]);
+  }
+};
+
 const init = () => {
   if (!shell.which('nim')) {
     console.log(
@@ -52,6 +65,8 @@ const init = () => {
     );
     process.exit(1);
   }
+
+  checkToken();
 
   console.log(
     chalk.green(
@@ -69,7 +84,9 @@ const init = () => {
     'https://nimbella.com'
   );
   console.log(nimbella);
-  login.register(true);
+  if (config.get('accounts.active') === 'none') {
+    login.register(true);
+  }
 };
 
 const getHelp = () => {
@@ -140,6 +157,12 @@ const twirlTimer = () => {
 const runCommand = async command => {
   let misc_data = {};
   let ns = null;
+  const args = command
+    .trim()
+    .split(/\s/)
+    .filter(value => value !== '')
+    // Remove the command to return only args
+    .slice(1);
 
   try {
     if (login.isFirstTimeLogin() && command !== 'register') {
@@ -152,8 +175,7 @@ const runCommand = async command => {
     }
 
     if (command.startsWith('login')) {
-      login.login(command.substring(command.indexOf(' ') + 1));
-      return null;
+      return login.login(args);
     }
 
     if (command === 'workbench') {
@@ -188,8 +210,8 @@ const runCommand = async command => {
       command: '/nc',
       team_domain: 'commander-cli',
       syncRequest: 'true',
-      user_id: login.getUser(),
-      team_id: login.getTeam(),
+      user_id: login.getClientCreds().user,
+      team_id: login.getClientCreds().password,
       misc: misc_data,
       text: command,
     };
@@ -202,8 +224,8 @@ const runCommand = async command => {
     const res = await axios.post(gateway, messageBody, {
       headers: subject,
       auth: {
-        username: login.getPlatformUser(),
-        password: login.getPlatformPassword(),
+        username: login.getUserCreds().username,
+        password: login.getUserCreds().password,
       },
     });
 
@@ -271,7 +293,9 @@ async function main() {
       console.log(getHelp());
       process.exit();
     } else {
-      login.register(false);
+      if (config.get('accounts.active') === 'none') {
+        login.register(false);
+      }
       const result = await runCommand(args.join(' '));
       console.log(renderResult(result));
     }

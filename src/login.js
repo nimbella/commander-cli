@@ -56,24 +56,112 @@ const firstTimeLogin = result => {
   }
 };
 
-const login = creds => {
-  if (!creds) {
-    console.log('No credentials given');
-    return;
-  }
-  const secret = creds.split(':');
-  if (!secret || secret.length !== 2) {
-    console.log('Failed to extract login creds from:', creds);
-    return;
-  }
-  config.set('userID', secret[0]);
-  config.set('teamID', secret[1]);
+const error = msg => ({ attachments: [{ color: 'danger', text: msg }] });
 
-  console.log(
-    'Temporarily using the following creds: ',
-    config.get('userID'),
-    config.get('teamID')
-  );
+/**
+ * Returns the client name based on the length of the token.
+ * @param {string} token - The login token.
+ * @returns {("slack"| "mattermost"|"teams"|"cli")} - The client name.
+ */
+const determineClient = token => {
+  if (token.length === 19) {
+    return 'slack';
+  } else if (token.length === 53) {
+    return 'mattermost';
+  } else if (token.length === 127) {
+    return 'teams';
+  } else {
+    return 'cli';
+  }
+};
+
+const setUserCreds = (username, password) => {
+  return config.set('accounts.platform', { username, password });
+};
+
+const getUserCreds = () => {
+  return config.get('accounts.platform');
+};
+
+const setClientCreds = (user, team, client) => {
+  const clients = config.get('accounts.clients');
+  clients[user] = {
+    user: user,
+    password: team,
+    client: client,
+  };
+
+  return config.set('accounts.clients', clients);
+};
+
+const getClientCreds = () => {
+  const accounts = config.get('accounts');
+
+  return accounts.clients[accounts.active];
+};
+
+const setActiveAccount = user => {
+  return config.set('accounts.active', user);
+};
+
+const getAuth = () => {
+  const { user, password } = getClientCreds();
+  return user + ':' + password;
+};
+
+const login = async (args = []) => {
+  const { prompt } = require('inquirer');
+
+  const [arg] = args;
+  if (args.length === 0) {
+    const creds = getClientCreds();
+    const output = [
+      `Currently used credentials:`,
+      `User: ${creds.user}`,
+      `Password: ${creds.password}`,
+      `Client: ${creds.client}`,
+      '', // Empty line
+    ];
+
+    console.log(output.join('\n'));
+
+    const clients = Object.values(config.get('accounts.clients'));
+    const choices = [];
+
+    for (const client of clients) {
+      choices.push({
+        name: `${client.client} (${client.user.slice(0, 5)}...)`,
+        value: client.user,
+      });
+    }
+
+    try {
+      const { userId } = await prompt([
+        {
+          type: 'list',
+          name: 'userId',
+          message: 'Select the account:',
+          choices: choices,
+        },
+      ]);
+
+      setActiveAccount(userId);
+      return {
+        text: `Using ${userId} now.`,
+      };
+    } catch (err) {
+      return error(err.message);
+    }
+  }
+
+  const [user, password] = arg.trim().split(':');
+  if (!user || !password) {
+    return error(`Failed to extract login creds from: ${arg}`);
+  }
+
+  setClientCreds(user, password, determineClient(arg.trim()));
+  setActiveAccount(user);
+  return { text: 'succesfully set your credentials' };
 };
 
 const register = interactive => {
@@ -87,32 +175,15 @@ const register = interactive => {
     }
   } else {
     const secret = res.stdout.split(':');
-    config.set('userID', secret[0]);
-    config.set('teamID', secret[1].trim());
-    config.set('platformUser', secret[0]);
-    config.set('platformPassword', secret[1].trim());
+    setClientCreds(secret[0], secret[1].trim(), 'cli');
+    setUserCreds(secret[0], secret[1].trim());
+    setActiveAccount(secret[0]);
 
     if (interactive) {
-      shell.echo('Your user id: ', config.get('userID'));
-      shell.echo('Your team id: ', config.get('teamID'));
-      shell.echo(
-        'Your namespace: ',
-        shell.exec(`nim auth current`, { silent: true }).trim()
-      );
+      const { user, client } = getClientCreds();
+      console.log(`Your client: ${client} (${user.slice(0, 5)}...)`);
     }
   }
-};
-
-const getUser = () => {
-  return config.get('userID');
-};
-
-const getTeam = () => {
-  return config.get('teamID');
-};
-
-const getAuth = () => {
-  return config.get('userID') + ':' + config.get('teamID');
 };
 
 const getNs = () => {
@@ -124,24 +195,15 @@ const getWorkbenchURL = () => {
   return `${workbenchURL}?command=auth login` + ` --auth=${getAuth()}`;
 };
 
-const getPlatformUser = () => {
-  return config.get('platformUser');
-};
-
-const getPlatformPassword = () => {
-  return config.get('platformPassword');
-};
-
 module.exports = {
-  register,
-  firstTimeLogin,
-  getPlatformUser,
-  getPlatformPassword,
-  getUser,
-  getTeam,
-  getAuth,
   getNs,
+  login,
+  getAuth,
+  register,
+  getClientCreds,
+  firstTimeLogin,
   getWorkbenchURL,
   isFirstTimeLogin,
-  login,
+  getUserCreds,
+  setUserCreds,
 };
