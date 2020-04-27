@@ -19,7 +19,6 @@
  */
 
 const shell = require('shelljs');
-const chalk = require('chalk');
 
 const config = require('./utils/config');
 const auth = require('./auth');
@@ -30,31 +29,6 @@ const isFirstTimeLogin = () => {
     config.get('userID') === 'ucommandercli' ||
     config.get('teamID') === 'tcommandercli'
   );
-};
-
-const firstTimeLogin = result => {
-  if (result.startsWith('Registered successfully with Commander')) {
-    const loginAuth = result.split('Auth=')[1];
-    const res = shell.exec(`nim auth login --auth=${loginAuth}`, {
-      silent: true,
-    });
-    if (!res.code) {
-      shell.echo(res.output);
-    } else {
-      shell.echo('Failed to login to the namespace');
-      shell.echo(res.output);
-      shell.exit(1);
-    }
-    const secret = loginAuth.split(':');
-    config.set('userID', secret[0]);
-    config.set('teamID', secret[1]);
-    console.log(
-      chalk.white.bgBlack.bold(`Successfully registered with Commander\n`)
-    );
-  } else {
-    console.log('Failed to register with Commander');
-    shell.exit(1);
-  }
 };
 
 const error = msg => ({ attachments: [{ color: 'danger', text: msg }] });
@@ -220,7 +194,6 @@ module.exports = {
   getAuth,
   register,
   getClientCreds,
-  firstTimeLogin,
   getWorkbenchURL,
   isFirstTimeLogin,
   getUserCreds,
