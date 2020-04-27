@@ -22,6 +22,7 @@ const shell = require('shelljs');
 const chalk = require('chalk');
 
 const config = require('./utils/config');
+const auth = require('./auth');
 const workbenchURL = 'https://apigcp.nimbella.io/wb';
 
 const isFirstTimeLogin = () => {
@@ -164,25 +165,43 @@ const login = async (args = []) => {
   return { text: 'succesfully set your credentials' };
 };
 
-const register = interactive => {
+const register = async interactive => {
   const res = shell.exec(`nim auth current --auth`, { silent: true });
+  let secret = null;
+  let ns = null;
   if (res.code) {
-    shell.echo(
-      'Type register or login userid:teamid to start working on your serverless commands!'
-    );
     if (!interactive) {
+      console.log('No account found. Please sign up on the Nimbella platform');
       shell.exit(1);
     }
-  } else {
-    const secret = res.stdout.split(':');
-    setClientCreds(secret[0], secret[1].trim(), 'cli');
-    setUserCreds(secret[0], secret[1].trim());
-    setActiveAccount(secret[0]);
-
-    if (interactive) {
-      const { user, client } = getClientCreds();
-      console.log(`Your client: ${client} (${user.slice(0, 5)}...)`);
+    const resp = await auth();
+    if (resp.status !== 'success') {
+      console.log('Failed to login to signup/login to your account');
+      shell.exit(1);
     }
+    secret = [resp.uuid, resp.key];
+    ns = resp.namespace;
+  } else {
+    secret = res.stdout.split(':');
+    ns = shell.exec(`nim auth current`, { silent: true }).trim();
+  }
+  setClientCreds(secret[0], secret[1].trim(), 'cli');
+  setUserCreds(secret[0], secret[1].trim());
+  setActiveAccount(secret[0]);
+
+  if (interactive) {
+    const { user, client } = getClientCreds();
+    console.log(`Your client: ${client} (${user.slice(0, 5)}...)`);
+  }
+  config.set('userID', secret[0]);
+  config.set('teamID', secret[1].trim());
+  config.set('platformUser', secret[0]);
+  config.set('platformPassword', secret[1].trim());
+
+  if (interactive) {
+    shell.echo('Your user id: ', config.get('userID'));
+    shell.echo('Your team id: ', config.get('teamID'));
+    shell.echo('Your namespace: ' + ns);
   }
 };
 

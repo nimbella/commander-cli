@@ -58,7 +58,7 @@ const checkToken = () => {
   }
 };
 
-const init = () => {
+const init = async () => {
   if (!shell.which('nim')) {
     console.log(
       'Commander CLI requires nim. You can install it by following the instructions at https://nimbella.io/downloads/nim/nim.html#install-the-nimbella-command-line-tool-nim'
@@ -85,7 +85,7 @@ const init = () => {
   );
   console.log(nimbella);
   if (config.get('accounts.active') === 'none') {
-    login.register(true);
+    await login.register(true);
   }
 };
 
@@ -315,13 +315,13 @@ async function main() {
       process.exit();
     } else {
       if (config.get('accounts.active') === 'none') {
-        login.register(false);
+        await login.register(false);
       }
       const result = await runCommand(args.join(' '));
       console.log(renderResult(result));
     }
   } else {
-    init();
+    await init();
 
     // eslint-disable-next-line no-constant-condition
     while (true) {
