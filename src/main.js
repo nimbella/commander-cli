@@ -45,29 +45,7 @@ inquirerCommandPrompt.setConfig({
 });
 inquirer.registerPrompt('command', inquirerCommandPrompt);
 
-const checkToken = () => {
-  const res = shell.exec('nim auth current --auth', { silent: true });
-  if (res.code) {
-    console.log("Couldn't verify if the user credentials of nim match");
-  }
-
-  const { username, password } = login.getUserCreds();
-  if (res.stdout.trim() !== `${username}:${password}`) {
-    const token = res.stdout.trim().split(':');
-    login.setUserCreds(token[0], token[1]);
-  }
-};
-
 const init = async () => {
-  if (!shell.which('nim')) {
-    console.log(
-      'Commander CLI requires nim. You can install it by following the instructions at https://nimbella.io/downloads/nim/nim.html#install-the-nimbella-command-line-tool-nim'
-    );
-    process.exit(1);
-  }
-
-  checkToken();
-
   console.log(
     chalk.green(
       figlet.textSync('Commander CLI', {
@@ -91,10 +69,10 @@ const init = async () => {
     const { user, client } = login.getClientCreds();
 
     console.log(
-      `\nCurrently using:\nclient: ${chalk.bold(client)} (${user.slice(
+      `Your client: ${chalk.bold(client)} (${user.slice(
         0,
         10
-      )}...)\nplatform: ${login.getNs()}`
+      )}...)\nYour namespace: ${login.getUserCreds().namespace}`
     );
   }
 };
@@ -195,7 +173,7 @@ const runCommand = async command => {
 
     if (command.startsWith('/nc')) {
       command = command.substring(command.indexOf(' ') + 1);
-    } else if (command.startsWith('nim')) {
+    } else if (command.startsWith('nim') && shell.which('nim')) {
       shell.exec(command);
       return null;
     }
@@ -207,7 +185,7 @@ const runCommand = async command => {
       return null;
     }
 
-    if (command === 'register' && (ns = login.getNs())) {
+    if (command === 'register' && (ns = login.getUserCreds().namespace)) {
       misc_data = Object.assign(misc_data, { '"namespace"': `"${ns}"` });
     }
     misc_data = JSON.stringify(misc_data);

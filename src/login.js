@@ -50,8 +50,8 @@ const determineClient = token => {
   }
 };
 
-const setUserCreds = (username, password) => {
-  return config.set('accounts.platform', { username, password });
+const setUserCreds = (username, password, namespace) => {
+  return config.set('accounts.platform', { username, password, namespace });
 };
 
 const getUserCreds = () => {
@@ -141,48 +141,26 @@ const login = async (args = []) => {
 };
 
 const register = async interactive => {
-  const res = shell.exec(`nim auth current --auth`, { silent: true });
   let secret = null;
   let ns = null;
-  if (res.code) {
-    if (!interactive) {
-      console.log('No account found. Please sign up on the Nimbella platform');
-      shell.exit(1);
-    }
-    const resp = await auth();
-    if (resp.status !== 'success') {
-      console.log('Failed to login to signup/login to your account');
-      shell.exit(1);
-    }
-    secret = [resp.uuid, resp.key];
-    ns = resp.namespace;
-  } else {
-    secret = res.stdout.split(':');
-    ns = shell.exec(`nim auth current`, { silent: true }).trim();
+  if (!interactive) {
+    console.log('No account found. Please sign up on the Nimbella platform');
+    shell.exit(1);
   }
+  const resp = await auth();
+  if (resp.status !== 'success') {
+    console.log('Failed to login to signup/login to your account');
+    shell.exit(1);
+  }
+  secret = [resp.uuid, resp.key];
+  ns = resp.namespace;
   setClientCreds(secret[0], secret[1].trim(), 'cli');
-  setUserCreds(secret[0], secret[1].trim());
+  setUserCreds(secret[0], secret[1].trim(), ns);
   setActiveAccount(secret[0]);
 
-  if (interactive) {
-    const { user, client } = getClientCreds();
-    console.log(`Your client: ${client} (${user.slice(0, 5)}...)`);
-  }
-  config.set('userID', secret[0]);
-  config.set('teamID', secret[1].trim());
-  config.set('platformUser', secret[0]);
-  config.set('platformPassword', secret[1].trim());
-
-  if (interactive) {
-    shell.echo('Your user id: ', config.get('userID'));
-    shell.echo('Your team id: ', config.get('teamID'));
-    shell.echo('Your namespace: ' + ns);
-  }
-};
-
-const getNs = () => {
-  const res = shell.exec(`nim auth current`, { silent: true });
-  return res.code ? null : res.stdout.trim();
+  const { user, client } = getClientCreds();
+  console.log(`Your client: ${client} (${user.slice(0, 5)}...)`);
+  console.log('Your namespace: ' + ns);
 };
 
 const getWorkbenchURL = () => {
@@ -190,7 +168,6 @@ const getWorkbenchURL = () => {
 };
 
 module.exports = {
-  getNs,
   login,
   getAuth,
   register,
