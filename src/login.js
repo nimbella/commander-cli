@@ -19,17 +19,10 @@
  */
 
 const shell = require('shelljs');
-
+const chalk = require('chalk');
 const config = require('./utils/config');
 const auth = require('./auth');
 const workbenchURL = 'https://apigcp.nimbella.io/wb';
-
-const isFirstTimeLogin = () => {
-  return (
-    config.get('userID') === 'ucommandercli' ||
-    config.get('teamID') === 'tcommandercli'
-  );
-};
 
 const error = msg => ({ attachments: [{ color: 'danger', text: msg }] });
 
@@ -135,9 +128,10 @@ const login = async (args = []) => {
     return error(`Failed to extract login creds from: ${arg}`);
   }
 
-  setClientCreds(user, password, determineClient(arg.trim()));
+  const client = determineClient(arg.trim());
+  setClientCreds(user, password, client);
   setActiveAccount(user);
-  return { text: 'succesfully set your credentials' };
+  return { text: 'Logged in successfully to ' + chalk.green(client) };
 };
 
 const register = async interactive => {
@@ -173,7 +167,6 @@ module.exports = {
   register,
   getClientCreds,
   getWorkbenchURL,
-  isFirstTimeLogin,
   getUserCreds,
   setUserCreds,
 };

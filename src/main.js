@@ -153,10 +153,6 @@ const runCommand = async command => {
     .slice(1);
 
   try {
-    if (login.isFirstTimeLogin() && command !== 'register') {
-      console.log('Type register to start working on Commander');
-      return null;
-    }
     if (command === '?' || command === 'help') {
       getHelp(command);
       return null;
