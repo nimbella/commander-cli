@@ -129,7 +129,8 @@ const login = async (args = []) => {
     }
   }
 
-  const [user, password] = arg.trim().split(':');
+  const user = arg.slice(0, arg.lastIndexOf(':'));
+  const password = arg.slice(arg.lastIndexOf(':') + 1);
   if (!user || !password) {
     return error(`Failed to extract login creds from: ${arg}`);
   }
