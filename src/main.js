@@ -243,7 +243,7 @@ const runCommand = async command => {
     process.stdout.clearLine();
     process.stdout.cursorTo(0);
 
-    if (command.startsWith('api_get')) {
+    if (command.startsWith('api_get') && command.split(' ').length > 1) {
       const data = JSON.parse(res.data.text);
 
       console.log(JSON.stringify(data, null, 2));
