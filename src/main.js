@@ -84,8 +84,18 @@ const init = async () => {
     'https://nimbella.com'
   );
   console.log(nimbella);
+
   if (config.get('accounts.active') === 'none') {
     await login.register(true);
+  } else {
+    const { user, client } = login.getClientCreds();
+
+    console.log(
+      `\nCurrently using:\nclient: ${chalk.bold(client)} (${user.slice(
+        0,
+        10
+      )}...)\nplatform: ${login.getNs()}`
+    );
   }
 };
 
@@ -243,7 +253,8 @@ const runCommand = async command => {
     process.stdout.clearLine();
     process.stdout.cursorTo(0);
 
-    if (command.startsWith('api_get') && command.split(' ').length > 1) {
+    // Check if text is JSON.
+    if (res.data.text && res.data.text.startsWith('{')) {
       const data = JSON.parse(res.data.text);
 
       console.log(JSON.stringify(data, null, 2));
