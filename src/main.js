@@ -143,8 +143,7 @@ const twirlTimer = () => {
 };
 
 const runCommand = async command => {
-  let misc_data = {};
-  let ns = null;
+  let loader = null;
   const args = command
     .trim()
     .split(/\s/)
@@ -181,11 +180,6 @@ const runCommand = async command => {
       return null;
     }
 
-    if (command === 'register' && (ns = login.getUserCreds().namespace)) {
-      misc_data = Object.assign(misc_data, { '"namespace"': `"${ns}"` });
-    }
-    misc_data = JSON.stringify(misc_data);
-
     const __ow_headers = {
       accept: 'application/json',
       'content-type': 'application/x-www-form-urlencoded',
@@ -196,11 +190,10 @@ const runCommand = async command => {
       syncRequest: 'true',
       user_id: login.getClientCreds().user,
       team_id: login.getClientCreds().password,
-      misc: misc_data,
       text: command,
     };
 
-    const loader = twirlTimer();
+    loader = twirlTimer();
     const subject = Object.assign(
       { __ow_headers: __ow_headers, 'user-agent': 'commander-cli' },
       messageBody
@@ -213,6 +206,10 @@ const runCommand = async command => {
       },
     });
 
+    clearInterval(loader);
+    process.stdout.clearLine();
+    process.stdout.cursorTo(0);
+
     if (res.status !== 200) {
       return {
         attachments: [
@@ -223,9 +220,6 @@ const runCommand = async command => {
         ],
       };
     }
-    clearInterval(loader);
-    process.stdout.clearLine();
-    process.stdout.cursorTo(0);
 
     // Check if text is JSON.
     if (res.data.text && res.data.text.startsWith('{')) {
@@ -250,6 +244,11 @@ const runCommand = async command => {
 
     return res.data;
   } catch (error) {
+    if (loader) {
+      clearInterval(loader);
+      process.stdout.clearLine();
+      process.stdout.cursorTo(0);
+    }
     return {
       attachments: [
         {
