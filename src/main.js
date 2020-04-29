@@ -174,10 +174,9 @@ const runCommand = async command => {
     }
 
     if (command.startsWith('app_add') || command.startsWith('app_delete')) {
-      console.log(
-        'Sorry app addition/deletion is not supported in the cli mode'
-      );
-      return null;
+      return {
+        text: 'Sorry app addition/deletion is not supported in the cli mode',
+      };
     }
 
     const __ow_headers = {
@@ -341,7 +340,11 @@ async function main() {
         default: {
           const result = await runCommand(command);
 
-          if (result.attachments && result.attachments[0].color === 'danger') {
+          if (
+            result !== null &&
+            result.attachments &&
+            result.attachments[0].color === 'danger'
+          ) {
             const output = renderResult(result);
             console.log(output);
             continue;
