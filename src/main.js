@@ -27,14 +27,12 @@ const open = require('open');
 const terminalLink = require('terminal-link');
 const inquirer = require('inquirer');
 const inquirerCommandPrompt = require('inquirer-command-prompt');
-const axios = require('axios');
 
 const login = require('./login');
 const renderResult = require('./render');
 const config = require('./utils/config');
 const { replCommands, commanderCommands } = require('./utils/commands');
-const gateway =
-  'https://apigcp.nimbella.io/api/v1/web/nc-dev/portal/cli-gateway';
+const { invokeCommand, register } = require('./utils');
 
 inquirerCommandPrompt.setConfig({
   history: {
@@ -64,7 +62,7 @@ const init = async () => {
   console.log(nimbella);
 
   if (config.get('accounts.active') === 'none') {
-    await login.register(true);
+    await register(true);
   } else {
     const { user, client } = login.getClientCreds();
 
@@ -179,32 +177,8 @@ const runCommand = async command => {
       };
     }
 
-    const __ow_headers = {
-      accept: 'application/json',
-      'content-type': 'application/x-www-form-urlencoded',
-    };
-    const messageBody = {
-      command: '/nc',
-      team_domain: 'commander-cli',
-      syncRequest: 'true',
-      user_id: login.getClientCreds().user,
-      team_id: login.getClientCreds().password,
-      text: command,
-    };
-
     loader = twirlTimer();
-    const subject = Object.assign(
-      { __ow_headers: __ow_headers, 'user-agent': 'commander-cli' },
-      messageBody
-    );
-    const res = await axios.post(gateway, messageBody, {
-      headers: subject,
-      auth: {
-        username: login.getUserCreds().username,
-        password: login.getUserCreds().password,
-      },
-    });
-
+    const res = await invokeCommand(command);
     clearInterval(loader);
     process.stdout.clearLine();
     process.stdout.cursorTo(0);
@@ -298,7 +272,7 @@ async function main() {
       process.exit();
     } else {
       if (config.get('accounts.active') === 'none') {
-        await login.register(false);
+        await register(false);
       }
       const result = await runCommand(args.join(' '));
       console.log(renderResult(result));

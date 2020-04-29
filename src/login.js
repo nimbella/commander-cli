@@ -18,10 +18,8 @@
  * from Nimbella Corp.
  */
 
-const shell = require('shelljs');
 const chalk = require('chalk');
 const config = require('./utils/config');
-const auth = require('./auth');
 const workbenchURL = 'https://apigcp.nimbella.io/wb';
 
 const error = msg => ({ attachments: [{ color: 'danger', text: msg }] });
@@ -134,29 +132,6 @@ const login = async (args = []) => {
   return { text: 'Logged in successfully to ' + chalk.green(client) };
 };
 
-const register = async interactive => {
-  let secret = null;
-  let ns = null;
-  if (!interactive) {
-    console.log('No account found. Please sign up on the Nimbella platform');
-    shell.exit(1);
-  }
-  const resp = await auth();
-  if (resp.status !== 'success') {
-    console.log('Failed to login to signup/login to your account');
-    shell.exit(1);
-  }
-  secret = [resp.uuid, resp.key];
-  ns = resp.namespace;
-  setClientCreds(secret[0], secret[1].trim(), 'cli');
-  setUserCreds(secret[0], secret[1].trim(), ns);
-  setActiveAccount(secret[0]);
-
-  const { user, client } = getClientCreds();
-  console.log(`Your client: ${client} (${user.slice(0, 5)}...)`);
-  console.log('Your namespace: ' + ns);
-};
-
 const getWorkbenchURL = () => {
   return `${workbenchURL}?command=auth login` + ` --auth=${getAuth()}`;
 };
@@ -164,9 +139,10 @@ const getWorkbenchURL = () => {
 module.exports = {
   login,
   getAuth,
-  register,
-  getClientCreds,
   getWorkbenchURL,
-  getUserCreds,
   setUserCreds,
+  getUserCreds,
+  setClientCreds,
+  getClientCreds,
+  setActiveAccount,
 };
