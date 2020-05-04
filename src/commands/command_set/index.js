@@ -69,7 +69,7 @@ const createCommandSet = async commandSet => {
   const yaml = require('js-yaml');
 
   const commandSetDir = join(process.cwd(), commandSet.name);
-  const commandsDir = join(commandSetDir, `/projects/${commandSet.name}`);
+  const commandsDir = join(commandSetDir, `/packages/${commandSet.name}`);
 
   // Create directories.
   await mkdirp(commandsDir);
