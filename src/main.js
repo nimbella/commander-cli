@@ -33,6 +33,7 @@ const renderResult = require('./render');
 const config = require('./utils/config');
 const { replCommands, commanderCommands } = require('./utils/commands');
 const { invokeCommand, register } = require('./utils');
+const commands = require('./commands');
 
 inquirerCommandPrompt.setConfig({
   history: {
@@ -162,6 +163,10 @@ const runCommand = async command => {
     if (command === 'workbench') {
       open(login.getWorkbenchURL());
       return null;
+    }
+
+    if (command.startsWith('command_set')) {
+      return commands.commandSet(args);
     }
 
     if (command.startsWith('/nc')) {

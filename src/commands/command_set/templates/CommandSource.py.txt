@@ -1,0 +1,46 @@
+import traceback
+
+"""
+@description Run the user command
+@param {ParamsType} params list of command parameters
+@param {?string} commandText text message
+@param {!object} [secrets = {}] list of secrets
+@return {Promise<SlackBodyType>} Response body
+"""
+
+
+def _command(params, commandText, secrets):
+
+    # DESTRUCTURED_ARGS = params[key];
+    return {
+        "response_type": "in_channel",  # or `ephemeral` for private response
+        "text": "This is a default response for a newly created command with text: "
+        + commandText,
+    }
+
+
+"""
+@typedef {object} SlackBodyType
+@property {string} text
+@property {'in_channel'|'ephemeral'} [response_type]
+"""
+
+
+def main(args):
+    try:
+        return {
+            "body": _command(args["params"], args["commandText"], args["__secrets"])
+        }
+    except Exception as e:
+        # To get more info, run `/nc activation_log` after your command executes
+        response = {
+            "response_type": "ephemeral",
+            "attachments": [
+                {
+                    "title": "Function error: " + str(e),
+                    "color": "danger",
+                    "text": traceback.format_exc(),
+                }
+            ],
+        }
+        return {"body": response}
