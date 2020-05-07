@@ -1,14 +1,7 @@
-const replCommands = [
-  '.clear',
-  '.exit',
-  '.help',
-  'login',
-  'workbench',
-  'nim',
-  'api_get',
-];
+const replCommands = ['.clear', '.exit', '.help', 'login', 'workbench', 'nim'];
 
 const commanderCommands = [
+  'api_get',
   'app_admins',
   'app_current',
   'app_desc',
