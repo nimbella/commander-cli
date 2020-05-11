@@ -317,7 +317,11 @@ async function main() {
           break;
         }
         default: {
-          const result = await runCommand(command);
+          let result = await runCommand(command);
+
+          if (result.body) {
+            result = result.body;
+          }
 
           if (
             result !== null &&

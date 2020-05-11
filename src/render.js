@@ -32,7 +32,7 @@ const formatBlockElement = element => {
     }
   }
 
-  return blockOutput.join(' ');
+  return blockOutput.join('');
 };
 
 const formatText = (text = '') => {
