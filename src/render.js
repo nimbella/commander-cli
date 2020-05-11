@@ -101,6 +101,10 @@ const renderResult = (result = {}) => {
     }
   }
 
+  if (output.length === 0) {
+    output.push(`\`\`\` ${JSON.stringify(result, null, 2)} \`\`\``);
+  }
+
   return marked(output.join('\n')).trim();
 };
 
