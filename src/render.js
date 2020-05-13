@@ -55,6 +55,10 @@ const renderResult = (result = {}) => {
     return '';
   }
 
+  if (result.body) {
+    result = result.body;
+  }
+
   const { text = '', attachments = [], blocks = [] } = result;
 
   if (text) {

@@ -27,13 +27,14 @@ const open = require('open');
 const terminalLink = require('terminal-link');
 const inquirer = require('inquirer');
 const inquirerCommandPrompt = require('inquirer-command-prompt');
+const { Command } = require('@oclif/command');
 
-const login = require('./login');
-const renderResult = require('./render');
-const config = require('./utils/config');
-const { replCommands, commanderCommands } = require('./utils/commands');
-const { invokeCommand, register } = require('./utils');
-const commands = require('./commands');
+const login = require('../login');
+const renderResult = require('../render');
+const config = require('../utils/config');
+const { replCommands, commanderCommands } = require('../utils/commands');
+const { invokeCommand, register } = require('../utils');
+const commands = require('../commands');
 
 inquirerCommandPrompt.setConfig({
   history: {
@@ -270,7 +271,7 @@ async function getCommand() {
 }
 
 async function main() {
-  const args = process.argv.slice(2);
+  const args = process.argv.slice(3);
   if (args.length > 0) {
     if (['help', '--help', '-h'].includes(args[0])) {
       console.log(getHelp());
@@ -317,11 +318,7 @@ async function main() {
           break;
         }
         default: {
-          let result = await runCommand(command);
-
-          if (result.body) {
-            result = result.body;
-          }
+          const result = await runCommand(command);
 
           if (
             result !== null &&
@@ -356,4 +353,18 @@ async function main() {
   }
 }
 
-main().catch(error => console.log(`nc> ${error.message}`));
+class Commander extends Command {
+  async run() {
+    try {
+      await main();
+    } catch (error) {
+      console.log(`nc> ${error.message}`);
+    }
+  }
+}
+
+Commander.strict = false;
+
+Commander.description = `interact with Nimbella Commander`;
+
+module.exports = Commander;
