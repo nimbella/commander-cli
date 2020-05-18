@@ -1,12 +1,5 @@
 const axios = require('axios');
-const auth = require('../auth');
-const {
-  getClientCreds,
-  getUserCreds,
-  setUserCreds,
-  setClientCreds,
-  setActiveAccount,
-} = require('../login');
+const { getClientCreds, getUserCreds, setClientCreds } = require('../login');
 
 const invokeCommand = async command => {
   const { username, password } = getUserCreds();
@@ -23,7 +16,7 @@ const invokeCommand = async command => {
     command: '/nc',
     team_domain: 'commander-cli',
     syncRequest: 'true',
-    user_id: clientCreds.user,
+    user_id: clientCreds.username,
     team_id: clientCreds.password,
     text: command,
   };
@@ -41,23 +34,9 @@ const invokeCommand = async command => {
   });
 };
 
-const register = async interactive => {
-  let secret = null;
-  let ns = null;
-  if (!interactive) {
-    console.log('No account found. Please sign up on the Nimbella platform');
-    process.exit(1);
-  }
-  const resp = await auth();
-  if (resp.status !== 'success') {
-    console.log('Failed to login to signup/login to your account');
-    process.exit(1);
-  }
-  secret = [resp.uuid, resp.key];
-  ns = resp.namespace;
-  setClientCreds(secret[0], secret[1].trim(), 'cli');
-  setUserCreds(secret[0], secret[1].trim(), ns);
-  setActiveAccount(secret[0]);
+const register = async () => {
+  const { username, password } = getUserCreds();
+  setClientCreds(username, password, 'cli');
 
   const res = await invokeCommand('register');
   const text = res.data.attachments
@@ -72,9 +51,10 @@ const register = async interactive => {
     process.exit(1);
   }
 
-  const { user, client } = getClientCreds();
+  const { username: user, client } = getClientCreds();
+  const { namespace } = getUserCreds();
   console.log(`Your client: ${client} (${user.slice(0, 5)}...)`);
-  console.log('Your namespace: ' + ns);
+  console.log('Your namespace: ' + namespace);
 };
 
 module.exports = {

@@ -19,8 +19,19 @@
  */
 
 const chalk = require('chalk');
-const config = require('./utils/config');
 const workbenchURL = 'https://apigcp.nimbella.io/wb';
+
+const {
+  addCommanderData,
+  getCredentials,
+  fileSystemPersister,
+} = require('nimbella-cli/lib/deployer');
+
+let creds = {};
+async function getCurrentCreds() {
+  creds = await getCredentials(fileSystemPersister);
+}
+getCurrentCreds().catch(err => console.error(err));
 
 const error = msg => ({ attachments: [{ color: 'danger', text: msg }] });
 
@@ -41,38 +52,52 @@ const determineClient = token => {
   }
 };
 
-const setUserCreds = (username, password, namespace) => {
-  return config.set('accounts.platform', { username, password, namespace });
-};
-
 const getUserCreds = () => {
-  return config.get('accounts.platform');
+  const { namespace, ow } = creds;
+  const [username, password] = ow.api_key.split(':');
+  return { username, password, namespace };
 };
 
-const setClientCreds = (user, team, client) => {
-  const clients = config.get('accounts.clients');
-  clients[user] = {
-    user: user,
+const setClientCreds = async (user, team, client) => {
+  const commander = creds.commander || { clients: {} };
+  commander.clients[user] = {
+    username: user,
     password: team,
     client: client,
   };
+  commander.currentClient = user;
 
-  return config.set('accounts.clients', clients);
+  return await addCommanderData(
+    creds.ow.apihost,
+    creds.namespace,
+    commander,
+    fileSystemPersister
+  );
 };
 
 const getClientCreds = () => {
-  const accounts = config.get('accounts');
-
-  return accounts.clients[accounts.active];
+  return creds.commander.clients[creds.commander.currentClient];
 };
 
-const setActiveAccount = user => {
-  return config.set('accounts.active', user);
+const getClients = () => {
+  return creds.commander.clients;
+};
+
+const setCurrentClient = async user => {
+  const commander = creds.commander;
+  commander.currentClient = user;
+
+  return await addCommanderData(
+    creds.ow.apihost,
+    creds.namespace,
+    commander,
+    fileSystemPersister
+  );
 };
 
 const getAuth = () => {
-  const { user, password } = getClientCreds();
-  return user + ':' + password;
+  const { username, password } = getClientCreds();
+  return username + ':' + password;
 };
 
 const login = async (args = []) => {
@@ -80,24 +105,23 @@ const login = async (args = []) => {
 
   const [arg] = args;
   if (args.length === 0) {
-    const creds = getClientCreds();
+    const currentClient = getClientCreds();
     const output = [
       `Currently used credentials:`,
-      `User: ${creds.user}`,
-      `Password: ${creds.password}`,
-      `Client: ${creds.client}`,
+      `User: ${currentClient.username}`,
+      `Client: ${currentClient.client}`,
       '', // Empty line
     ];
 
     console.log(output.join('\n'));
 
-    const clients = Object.values(config.get('accounts.clients'));
+    const clients = Object.values(getClients());
     const choices = [];
 
     for (const client of clients) {
       choices.push({
-        name: `${client.client} (${client.user.slice(0, 5)}...)`,
-        value: client.user,
+        name: `${client.client} (${client.username.slice(0, 5)}...)`,
+        value: client.username,
       });
     }
 
@@ -111,7 +135,7 @@ const login = async (args = []) => {
         },
       ]);
 
-      setActiveAccount(userId);
+      setCurrentClient(userId);
       return {
         text: `Using ${userId} now.`,
       };
@@ -128,7 +152,6 @@ const login = async (args = []) => {
 
   const client = determineClient(arg.trim());
   setClientCreds(user, password, client);
-  setActiveAccount(user);
   return { text: 'Logged in successfully to ' + chalk.green(client) };
 };
 
@@ -136,13 +159,22 @@ const getWorkbenchURL = () => {
   return `${workbenchURL}?command=auth login` + ` --auth=${getAuth()}`;
 };
 
+const isFirstLogin = () => {
+  if (typeof creds.commander === 'undefined') {
+    return true;
+  }
+
+  return false;
+};
+
 module.exports = {
   login,
   getAuth,
   getWorkbenchURL,
-  setUserCreds,
   getUserCreds,
   setClientCreds,
   getClientCreds,
-  setActiveAccount,
+  setCurrentClient,
+  isFirstLogin,
+  getClients,
 };

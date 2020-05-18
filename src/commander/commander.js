@@ -18,8 +18,6 @@
  * from Nimbella Corp.
  */
 
-const path = require('path');
-
 const shell = require('shelljs');
 const chalk = require('chalk');
 const figlet = require('figlet');
@@ -27,11 +25,11 @@ const open = require('open');
 const terminalLink = require('terminal-link');
 const inquirer = require('inquirer');
 const inquirerCommandPrompt = require('inquirer-command-prompt');
-const { Command } = require('@oclif/command');
+const { NimBaseCommand } = require('nimbella-cli/lib/NimBaseCommand');
+const { nimbellaDir } = require('nimbella-cli/lib/deployer/credentials');
 
 const login = require('../login');
 const renderResult = require('../render');
-const config = require('../utils/config');
 const { replCommands, commanderCommands } = require('../utils/commands');
 const { invokeCommand, register } = require('../utils');
 const commands = require('../commands');
@@ -39,7 +37,7 @@ const commands = require('../commands');
 inquirerCommandPrompt.setConfig({
   history: {
     save: true,
-    folder: path.dirname(config.path),
+    folder: nimbellaDir(),
     limit: 20,
   },
 });
@@ -63,13 +61,13 @@ const init = async () => {
   );
   console.log(nimbella);
 
-  if (config.get('accounts.active') === 'none') {
+  if (login.isFirstLogin()) {
     await register(true);
   } else {
-    const { user, client } = login.getClientCreds();
+    const { username, client } = login.getClientCreds();
 
     console.log(
-      `Your client: ${chalk.bold(client)} (${user.slice(
+      `Your client: ${chalk.bold(client)} (${username.slice(
         0,
         10
       )}...)\nYour namespace: ${login.getUserCreds().namespace}`
@@ -83,10 +81,10 @@ const getHelp = () => {
     `A CLI to interact with Commander from your terminal.`,
     '', // Empty line
     `${chalk.bold('USAGE')}`,
-    `$ ${chalk.green('ncc')} - launch Commander REPL`,
-    `$ ${chalk.green('ncc help')} - display help for Commander CLI.`,
+    `$ ${chalk.green('nim commander')} - launch Commander REPL`,
+    `$ ${chalk.green('nim commander help')} - display help for Commander CLI.`,
     `$ ${chalk.green(
-      'ncc <command> [command_params/command_options]'
+      'nim commander <command> [command_params/command_options]'
     )} - run commander commands`,
     '', // Empty line
     `${chalk.bold('REPL Commands')}`,
@@ -270,14 +268,13 @@ async function getCommand() {
   return command;
 }
 
-async function main() {
-  const args = process.argv.slice(3);
+async function main(args) {
   if (args.length > 0) {
     if (['help', '--help', '-h'].includes(args[0])) {
       console.log(getHelp());
       process.exit();
     } else {
-      if (config.get('accounts.active') === 'none') {
+      if (login.isFirstLogin()) {
         await register(false);
       }
       const result = await runCommand(args.join(' '));
@@ -353,18 +350,18 @@ async function main() {
   }
 }
 
-class Commander extends Command {
+class Commander extends NimBaseCommand {
   async run() {
     try {
-      await main();
+      const { argv } = this.parse(Commander);
+      await main(argv);
     } catch (error) {
-      console.log(`nc> ${error.message}`);
+      console.log(`nc> ${error}`);
     }
   }
 }
 
 Commander.strict = false;
-
 Commander.description = `interact with Nimbella Commander`;
 
 module.exports = Commander;

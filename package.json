@@ -36,8 +36,6 @@
     "prettier": "^2.0.3"
   },
   "dependencies": {
-    "@oclif/command": "^1.6.1",
-    "@oclif/config": "^1.15.1",
     "axios": "^0.19.2",
     "chalk": "^4.0.0",
     "conf": "^6.2.4",
@@ -49,12 +47,14 @@
     "marked": "^0.8.2",
     "marked-terminal": "^4.0.0",
     "mkdirp": "^1.0.4",
+    "nimbella-cli": "http://preview-apigcp.nimbella.io/nimbella-cli.tgz",
     "open": "^7.0.3",
     "shelljs": "^0.8.3",
     "terminal-link": "^2.1.1"
   },
   "files": [
-    "src"
+    "src",
+    "bin"
   ],
   "oclif": {
     "commands": "./src/commander",
