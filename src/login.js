@@ -27,12 +27,6 @@ const {
   fileSystemPersister,
 } = require('nimbella-cli/lib/deployer');
 
-let creds = {};
-async function getCurrentCreds() {
-  creds = await getCredentials(fileSystemPersister);
-}
-getCurrentCreds().catch(err => console.error(err));
-
 const error = msg => ({ attachments: [{ color: 'danger', text: msg }] });
 
 /**
@@ -52,14 +46,16 @@ const determineClient = token => {
   }
 };
 
-const getUserCreds = () => {
-  const { namespace, ow } = creds;
+const getUserCreds = async () => {
+  const { namespace, ow } = await getCredentials(fileSystemPersister);
   const [username, password] = ow.api_key.split(':');
   return { username, password, namespace };
 };
 
 const setClientCreds = async (user, team, client) => {
-  const commander = creds.commander || { clients: {} };
+  const { commander = { clients: {} }, ow, namespace } = await getCredentials(
+    fileSystemPersister
+  );
   commander.clients[user] = {
     username: user,
     password: team,
@@ -68,35 +64,39 @@ const setClientCreds = async (user, team, client) => {
   commander.currentClient = user;
 
   return await addCommanderData(
-    creds.ow.apihost,
-    creds.namespace,
+    ow.apihost,
+    namespace,
     commander,
     fileSystemPersister
   );
 };
 
-const getClientCreds = () => {
-  return creds.commander.clients[creds.commander.currentClient];
+const getClientCreds = async () => {
+  const creds = await getCredentials(fileSystemPersister);
+
+  return await creds.commander.clients[creds.commander.currentClient];
 };
 
-const getClients = () => {
-  return creds.commander.clients;
+const getClients = async () => {
+  return await getCredentials(fileSystemPersister).commander.clients;
 };
 
 const setCurrentClient = async user => {
-  const commander = creds.commander;
+  const { commander, ow, namespace } = await getCredentials(
+    fileSystemPersister
+  );
   commander.currentClient = user;
 
   return await addCommanderData(
-    creds.ow.apihost,
-    creds.namespace,
+    ow.apihost,
+    namespace,
     commander,
     fileSystemPersister
   );
 };
 
-const getAuth = () => {
-  const { username, password } = getClientCreds();
+const getAuth = async () => {
+  const { username, password } = await getClientCreds();
   return username + ':' + password;
 };
 
@@ -105,7 +105,7 @@ const login = async (args = []) => {
 
   const [arg] = args;
   if (args.length === 0) {
-    const currentClient = getClientCreds();
+    const currentClient = await getClientCreds();
     const output = [
       `Currently used credentials:`,
       `User: ${currentClient.username}`,
@@ -115,7 +115,7 @@ const login = async (args = []) => {
 
     console.log(output.join('\n'));
 
-    const clients = Object.values(getClients());
+    const clients = Object.values(await getClients());
     const choices = [];
 
     for (const client of clients) {
@@ -135,7 +135,7 @@ const login = async (args = []) => {
         },
       ]);
 
-      setCurrentClient(userId);
+      await setCurrentClient(userId);
       return {
         text: `Using ${userId} now.`,
       };
@@ -151,7 +151,7 @@ const login = async (args = []) => {
   }
 
   const client = determineClient(arg.trim());
-  setClientCreds(user, password, client);
+  await setClientCreds(user, password, client);
   return { text: 'Logged in successfully to ' + chalk.green(client) };
 };
 
@@ -159,8 +159,9 @@ const getWorkbenchURL = () => {
   return `${workbenchURL}?command=auth login` + ` --auth=${getAuth()}`;
 };
 
-const isFirstLogin = () => {
-  if (typeof creds.commander === 'undefined') {
+const isFirstLogin = async () => {
+  const { commander } = await getCredentials(fileSystemPersister);
+  if (typeof commander === 'undefined') {
     return true;
   }
 

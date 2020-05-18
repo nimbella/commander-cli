@@ -2,8 +2,8 @@ const axios = require('axios');
 const { getClientCreds, getUserCreds, setClientCreds } = require('../login');
 
 const invokeCommand = async command => {
-  const { username, password } = getUserCreds();
-  const clientCreds = getClientCreds();
+  const { username, password } = await getUserCreds();
+  const clientCreds = await getClientCreds();
   const gateway =
     'https://apigcp.nimbella.io/api/v1/web/nc-dev/portal/cli-gateway';
 
@@ -35,9 +35,10 @@ const invokeCommand = async command => {
 };
 
 const register = async () => {
-  const { username, password } = getUserCreds();
-  setClientCreds(username, password, 'cli');
+  const { username, password } = await getUserCreds();
+  await setClientCreds(username, password, 'cli');
 
+  console.log("Please wait, we're registering your account with commander...");
   const res = await invokeCommand('register');
   const text = res.data.attachments
     ? res.data.attachments[0].text
@@ -49,10 +50,12 @@ const register = async () => {
     console.log(text);
     console.log('Failed to register with Commander');
     process.exit(1);
+  } else {
+    console.log('done.');
   }
 
-  const { username: user, client } = getClientCreds();
-  const { namespace } = getUserCreds();
+  const { username: user, client } = await getClientCreds();
+  const { namespace } = await getUserCreds();
   console.log(`Your client: ${client} (${user.slice(0, 5)}...)`);
   console.log('Your namespace: ' + namespace);
 };
