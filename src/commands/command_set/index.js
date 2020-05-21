@@ -1,3 +1,86 @@
+function generateReadme(commandSetName, commandsYamlPath) {
+  const fs = require('fs');
+  const yaml = require('js-yaml');
+
+  const file = commandsYamlPath;
+  const { commands } = yaml.safeLoad(fs.readFileSync(file, 'utf8'));
+
+  const title = `# ${commandSetName} Command Set\n\n`;
+  const commandsSection = ['## Commands\n'];
+  const usageSection = ['## Usage\n'];
+
+  for (const [command, commandDetails] of Object.entries(commands).sort()) {
+    let cmdRep = `/nc ${command}`;
+
+    if (commandDetails.parameters) {
+      for (const parameter of commandDetails.parameters) {
+        if (parameter.optional) {
+          cmdRep += ` [<${parameter.name}>]`;
+        } else {
+          cmdRep += ` <${parameter.name}>`;
+        }
+      }
+    }
+
+    if (commandDetails.options) {
+      for (const option of commandDetails.options) {
+        cmdRep += ` [-${option.name} <${
+          option.value ? option.value : option.name
+        }>]`;
+      }
+    }
+
+    commandsSection.push(`- [\`${command}\`](#${command})`);
+
+    usageSection.push(`### \`${command}\`\n`);
+
+    if (commandDetails.description) {
+      usageSection.push(commandDetails.description);
+    }
+
+    usageSection.push(`\`\`\`sh\n${cmdRep}\n\`\`\`\n`);
+  }
+
+  return title + commandsSection.join('\n') + '\n\n' + usageSection.join('\n');
+}
+
+function parseCommandProperties(cmd) {
+  const command = { name: '', options: [], parameters: [] };
+  command.name = cmd.trim().split(' ').shift();
+  // This is to help regex when the last substring is a parameter.
+  cmd += ' ';
+
+  // Matches [-flag] or [-flag <value>]
+  const options =
+    cmd.matchAll(/\[-([\w\d]+)\]|\[-([\w\d]+)(?:\s+\<([^\]]+))?\>]/g) || [];
+
+  // Matches [<optional>]
+  const optionalParameters = cmd.matchAll(/\[\<([\w\d]+)\>\]/g) || [];
+
+  // Matches <parameter>
+  const parameters = cmd.matchAll(/\<([\w\d]+)\>[^\]]/g) || [];
+
+  for (const option of options) {
+    const name = option[1] ? option[1] : option[2];
+    const value = option[3] ? option[3] : name;
+
+    command.options.push({
+      value,
+      name,
+    });
+  }
+
+  for (const parameter of parameters) {
+    command.parameters.push({ name: parameter[1], optional: false });
+  }
+
+  for (const optionalParameter of optionalParameters) {
+    command.parameters.push({ name: optionalParameter[1], optional: true });
+  }
+
+  return command;
+}
+
 const askQuestions = async () => {
   const { prompt } = require('inquirer');
   const commandSet = {
@@ -37,16 +120,27 @@ const askQuestions = async () => {
   commandSet.language = language;
 
   for (let i = 1; i <= numberOfCommands; i++) {
-    const { commandName } = await prompt([
+    const { commandDefinition } = await prompt([
       {
         type: 'input',
-        default: `command${i}`,
-        message: `Name of your command ${i}?`,
-        name: 'commandName',
+        default: `hello${i} <name>`,
+        message: `Define your command ${i}?`,
+        name: 'commandDefinition',
       },
     ]);
 
-    commandSet.commands.push({ commandName });
+    const { commandDescription } = await prompt([
+      {
+        type: 'input',
+        message: `Provide small description for the command`,
+        name: 'commandDescription',
+      },
+    ]);
+
+    commandSet.commands.push({
+      description: commandDescription,
+      ...parseCommandProperties(commandDefinition),
+    });
   }
 
   return commandSet;
@@ -81,20 +175,39 @@ const createCommandSet = async commandSet => {
   );
 
   for (const command of commandSet.commands) {
-    commands[command.commandName] = { description: '' };
+    commands[command.name] = command;
+    // Remove irrelavent fields
+    delete commands[command.name].name;
 
-    // Create command code with template code.
+    if (commands[command.name].options.length === 0) {
+      delete commands[command.name].options;
+    }
+
+    if (commands[command.name].parameters.length === 0) {
+      delete commands[command.name].parameters;
+    }
+
+    // Create commands with template code.
     await writeFile(
-      join(commandsDir, `${command.commandName}.${languageExtension}`),
+      join(commandsDir, `${command.name}.${languageExtension}`),
       commandCode
     );
   }
+
+  const commandsYamlPath = join(commandSetDir, 'commands.yaml');
 
   // Create commands.yaml file.
   const commandsYaml = yaml.safeDump({
     commands,
   });
-  await writeFile(join(commandSetDir, 'commands.yaml'), commandsYaml);
+  await writeFile(commandsYamlPath, commandsYaml);
+
+  // Create readme.md file.
+  const readmePath = join(commandSetDir, 'README.md');
+  await writeFile(
+    readmePath,
+    generateReadme(commandSet.name, commandsYamlPath)
+  );
 };
 
 module.exports = async (args = []) => {
