@@ -61,16 +61,16 @@ const init = async () => {
   );
   console.log(nimbella);
 
-  if (login.isFirstLogin()) {
+  if (await login.isFirstLogin()) {
     await register(true);
   } else {
-    const { username, client } = login.getClientCreds();
+    const { username, client } = await login.getClientCreds();
 
     console.log(
       `Your client: ${chalk.bold(client)} (${username.slice(
         0,
         10
-      )}...)\nYour namespace: ${login.getUserCreds().namespace}`
+      )}...)\nYour namespace: ${(await login.getUserCreds()).namespace}`
     );
   }
 };
@@ -274,7 +274,7 @@ async function main(args) {
       console.log(getHelp());
       process.exit();
     } else {
-      if (login.isFirstLogin()) {
+      if (await login.isFirstLogin()) {
         await register(false);
       }
       const result = await runCommand(args.join(' '));
@@ -356,7 +356,7 @@ class Commander extends NimBaseCommand {
       const { argv } = this.parse(Commander);
       await main(argv);
     } catch (error) {
-      console.log(`nc> ${error}`);
+      console.log(`nc> ${error.stack}`);
     }
   }
 }
