@@ -74,11 +74,11 @@ const setClientCreds = async (user, team, client) => {
 const getClientCreds = async () => {
   const creds = await getCredentials(fileSystemPersister);
 
-  return await creds.commander.clients[creds.commander.currentClient];
+  return creds.commander.clients[creds.commander.currentClient];
 };
 
 const getClients = async () => {
-  return await getCredentials(fileSystemPersister).commander.clients;
+  return (await getCredentials(fileSystemPersister)).commander.clients;
 };
 
 const setCurrentClient = async user => {
