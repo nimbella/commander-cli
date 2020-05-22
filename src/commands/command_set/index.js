@@ -129,10 +129,10 @@ const askQuestions = async () => {
       },
     ]);
 
-    const { commandDescription } = await prompt([
+    const { commandDescription = '' } = await prompt([
       {
         type: 'input',
-        message: `Provide small description for the command`,
+        message: `Provide small description for the command:`,
         name: 'commandDescription',
       },
     ]);
@@ -177,8 +177,6 @@ const createCommandSet = async commandSet => {
   for (const command of commandSet.commands) {
     commands[command.name] = command;
     // Remove irrelavent fields
-    delete commands[command.name].name;
-
     if (commands[command.name].options.length === 0) {
       delete commands[command.name].options;
     }
@@ -192,6 +190,10 @@ const createCommandSet = async commandSet => {
       join(commandsDir, `${command.name}.${languageExtension}`),
       commandCode
     );
+
+    // The primary reason to remove .name is because we use the same object to generate Yaml file and
+    // we don't want a name field under command.
+    delete commands[command.name].name;
   }
 
   const commandsYamlPath = join(commandSetDir, 'commands.yaml');
