@@ -1,10 +1,12 @@
 {
-  "name": "commander-cli",
-  "version": "0.0.1",
+  "name": "commander",
+  "version": "0.1.0",
   "description": "Commander CLI",
   "main": "src/main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "postpack": "rm -f oclif.manifest.json",
+    "prepack": "oclif-dev manifest && oclif-dev readme",
+    "version": "oclif-dev readme && git add README.md",
     "lint": "eslint \"**/*.js\" --fix --ignore-pattern node_modules/",
     "prelint": "prettier --write \"**/*.{js,md}\""
   },
@@ -31,11 +33,11 @@
     "eslint-config-prettier": "^6.10.1",
     "eslint-plugin-jest": "^22.5.1",
     "eslint-plugin-prettier": "^3.1.0",
-    "globby": "^11.0.0",
     "husky": "^4.2.3",
     "prettier": "^2.0.3"
   },
   "dependencies": {
+    "globby": "^11.0.0",
     "axios": "^0.19.2",
     "chalk": "^4.0.0",
     "conf": "^6.2.4",
@@ -56,8 +58,9 @@
     "node": ">=12.0.0"
   },
   "files": [
-    "src",
-    "bin"
+    "/npm-shrinkwrap.json",
+    "/oclif.manifest.json",
+    "/src"
   ],
   "oclif": {
     "commands": "./src/commander",
