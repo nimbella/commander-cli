@@ -2,7 +2,7 @@ const axios = require('axios');
 const { getClientCreds, getUserCreds, setClientCreds } = require('../login');
 
 const invokeCommand = async command => {
-  const { username, password } = await getUserCreds();
+  const { username, password, namespace } = await getUserCreds();
   const clientCreds = await getClientCreds();
   const gateway =
     'https://apigcp.nimbella.io/api/v1/web/nc-dev/portal/cli-gateway';
@@ -20,6 +20,10 @@ const invokeCommand = async command => {
     team_id: clientCreds.password,
     text: command,
   };
+
+  if (command === 'register' && clientCreds.client === 'cli') {
+    messageBody.misc = Object.assign({}, { namespace: namespace });
+  }
 
   return await axios.post(gateway, messageBody, {
     headers: {
