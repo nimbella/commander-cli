@@ -50,7 +50,7 @@
     "marked": "^0.8.2",
     "marked-terminal": "^4.0.0",
     "mkdirp": "^1.0.4",
-    "nimbella-cli": "http://preview-apigcp.nimbella.io/nimbella-cli.tgz",
+    "nimbella-cli": "https://preview-apigcp.nimbella.io/nimbella-cli.tgz",
     "open": "^7.0.3",
     "shelljs": "^0.8.3",
     "terminal-link": "^2.1.1"
