@@ -65,8 +65,8 @@ function parseCommandProperties(cmd) {
     const value = option[3] ? option[3] : name;
 
     command.options.push({
-      value,
       name,
+      value,
     });
   }
 
