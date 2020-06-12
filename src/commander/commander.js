@@ -131,6 +131,89 @@ const commanderHelp = [
   },
 ];
 
+const csmOfflineHandler = async command => {
+  const fs = require('fs');
+  const path = require('path');
+  const commandSetRelativePath = command.split(' ')[1];
+  const commandSetDir = path.join(process.cwd(), commandSetRelativePath);
+
+  let requestBody = {};
+  if (fs.existsSync(commandSetDir)) {
+    const execa = require('execa');
+    const Listr = require('listr');
+    const zipPath = path.join(
+      process.cwd(),
+      path.basename(commandSetDir) + '.zip'
+    );
+
+    const tasks = new Listr([
+      {
+        title: 'Create a zip of the command set',
+        task: async () => {
+          const archiver = require('archiver');
+          // create a file to stream archive data to.
+          const output = fs.createWriteStream(zipPath);
+          const archive = archiver('zip', {
+            zlib: { level: 9 }, // Sets the compression level.
+          });
+
+          // pipe archive data to the file
+          archive.pipe(output);
+
+          archive.directory(commandSetDir, path.basename(commandSetDir));
+
+          await archive.finalize();
+        },
+      },
+      {
+        title: 'Upload the zip',
+        task: async () => {
+          // Upload the zip
+          await execa.command(`nim object create ${zipPath}`);
+
+          // Remove the zip
+          fs.unlinkSync(zipPath);
+
+          // Deploy the action that retrieves the URL
+          await execa.command(
+            `nim action update get-object-url ${path.join(
+              __dirname,
+              '..',
+              'utils',
+              'getObjectUrl.js'
+            )}`
+          );
+
+          // Retrieve the URL to the uploaded file
+          const { stdout } = await execa.command(
+            `nim action invoke get-object-url -p filename ${path.basename(
+              zipPath
+            )}`
+          );
+
+          const { body } = JSON.parse(stdout);
+          requestBody = { nim_project_url: body };
+          // Only pass the basename so the command set name doesn't contain paths.
+          command = command.split(' ')[0] + ' ' + path.basename(commandSetDir);
+        },
+      },
+    ]);
+
+    await tasks.run().catch(e => {
+      return {
+        attachments: [
+          {
+            color: 'danger',
+            text: e,
+          },
+        ],
+      };
+    });
+  }
+
+  return { requestBody, command };
+};
+
 const twirlTimer = () => {
   const patterns = ['\\', '|', '/', '-'];
   var x = 0;
@@ -150,6 +233,14 @@ const runCommand = async command => {
     .slice(1);
 
   try {
+    let requestBody = {};
+
+    if (command.startsWith('csm_install') || command.startsWith('csm_update')) {
+      const result = await csmOfflineHandler(command);
+      requestBody = result.requestBody;
+      command = result.command;
+    }
+
     if (command === '?' || command === 'help') {
       getHelp(command);
       return null;
@@ -182,7 +273,7 @@ const runCommand = async command => {
     }
 
     loader = twirlTimer();
-    const res = await invokeCommand(command);
+    const res = await invokeCommand(command, requestBody);
     clearInterval(loader);
     process.stdout.clearLine();
     process.stdout.cursorTo(0);

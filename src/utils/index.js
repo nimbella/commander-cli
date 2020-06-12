@@ -1,7 +1,7 @@
 const axios = require('axios');
 const { getClientCreds, getUserCreds, setClientCreds } = require('../login');
 
-const invokeCommand = async command => {
+const invokeCommand = async (command, body = {}) => {
   const { username, password, namespace } = await getUserCreds();
   const clientCreds = await getClientCreds();
   const gateway =
@@ -19,6 +19,7 @@ const invokeCommand = async command => {
     user_id: clientCreds.username,
     team_id: clientCreds.password,
     text: command,
+    ...body,
   };
 
   if (command === 'register' && clientCreds.client === 'cli') {
