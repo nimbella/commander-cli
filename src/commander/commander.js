@@ -75,6 +75,15 @@ const init = async () => {
   }
 };
 
+/**
+ * Returns the version of Commander CLI.
+ * @returns {string} Current version of the CLI.
+ */
+const getVersion = () => {
+  const { version } = require('../../package.json');
+  return `v${version}`;
+};
+
 const getHelp = () => {
   const helpOutput = [
     `${chalk.bold('Commander CLI')}`,
@@ -364,6 +373,9 @@ async function main(args) {
     if (['help', '--help', '-h'].includes(args[0])) {
       console.log(getHelp());
       process.exit();
+    } else if (['version', '-v', '--version'].includes(args[0])) {
+      console.log(getVersion());
+      process.exit();
     } else {
       if (await login.isFirstLogin()) {
         await register(false);
@@ -405,6 +417,9 @@ async function main(args) {
           }
           break;
         }
+        case 'version':
+          console.log(getVersion());
+          break;
         default: {
           const result = await runCommand(command);
 
