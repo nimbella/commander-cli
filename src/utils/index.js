@@ -4,8 +4,7 @@ const { getClientCreds, getUserCreds, setClientCreds } = require('../login');
 const invokeCommand = async (command, body = {}) => {
   const { username, password, namespace } = await getUserCreds();
   const clientCreds = await getClientCreds();
-  const gateway =
-    'https://apigcp.nimbella.io/api/v1/web/nc-dev/portal/cli-gateway';
+  const gateway = 'https://apigcp.nimbella.io/api/v1/web/nc/portal/cli-gateway';
 
   const __ow_headers = {
     accept: 'application/json',
