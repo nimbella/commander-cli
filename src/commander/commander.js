@@ -150,14 +150,12 @@ const csmOfflineHandler = async command => {
   if (fs.existsSync(commandSetDir)) {
     const execa = require('execa');
     const Listr = require('listr');
-    const zipPath = path.join(
-      process.cwd(),
-      path.basename(commandSetDir) + '.zip'
-    );
+    const commandSetName = path.basename(commandSetDir);
+    const zipPath = path.join(process.cwd(), commandSetName + '.zip');
 
     const tasks = new Listr([
       {
-        title: 'Create a zip of the command set',
+        title: `Packaging ${commandSetName}...`,
         task: async () => {
           const archiver = require('archiver');
           // create a file to stream archive data to.
@@ -169,13 +167,13 @@ const csmOfflineHandler = async command => {
           // pipe archive data to the file
           archive.pipe(output);
 
-          archive.directory(commandSetDir, path.basename(commandSetDir));
+          archive.directory(commandSetDir, commandSetName);
 
           await archive.finalize();
         },
       },
       {
-        title: 'Upload the zip',
+        title: `Uploading ${commandSetName}...`,
         task: async () => {
           // Upload the zip
           await execa.command(`nim object create ${zipPath}`);
@@ -203,7 +201,7 @@ const csmOfflineHandler = async command => {
           const { body } = JSON.parse(stdout);
           requestBody = { nim_project_url: body };
           // Only pass the basename so the command set name doesn't contain paths.
-          command = command.split(' ')[0] + ' ' + path.basename(commandSetDir);
+          command = command.split(' ')[0] + ' ' + commandSetName;
         },
       },
     ]);
