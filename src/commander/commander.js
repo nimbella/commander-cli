@@ -181,25 +181,12 @@ const csmOfflineHandler = async command => {
           // Remove the zip
           fs.unlinkSync(zipPath);
 
-          // Deploy the action that retrieves the URL
-          await execa.command(
-            `nim action update get-object-url ${path.join(
-              __dirname,
-              '..',
-              'utils',
-              'getObjectUrl.js'
-            )}`
+          // Retrieve the URL of the uploaded object.
+          const { stdout: nim_project_url } = await execa.command(
+            `nim object url ${path.basename(zipPath)}`
           );
 
-          // Retrieve the URL to the uploaded file
-          const { stdout } = await execa.command(
-            `nim action invoke get-object-url -p filename ${path.basename(
-              zipPath
-            )}`
-          );
-
-          const { body } = JSON.parse(stdout);
-          requestBody = { nim_project_url: body };
+          requestBody = { nim_project_url };
           // Only pass the basename so the command set name doesn't contain paths.
           command = command.split(' ')[0] + ' ' + commandSetName;
         },
