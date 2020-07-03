@@ -124,15 +124,16 @@ const askQuestions = async () => {
       {
         type: 'input',
         default: `hello${i} <name>`,
-        message: `Define your command ${i}?`,
+        message: `Define your command ${i}:`,
         name: 'commandDefinition',
       },
     ]);
 
+    const commandName = commandDefinition.trim().split(' ')[0];
     const { commandDescription = '' } = await prompt([
       {
         type: 'input',
-        message: `Provide small description for the command:`,
+        message: `Provide a small description for ${commandName}:`,
         name: 'commandDescription',
       },
     ]);

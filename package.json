@@ -21,8 +21,7 @@
     "serverless",
     "cli"
   ],
-  "author": "Nikhil",
-  "license": "LicenseRef-LICENSE.md",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/nimbella-corp/commander-cli/issues"
   },
