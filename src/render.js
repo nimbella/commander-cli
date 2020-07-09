@@ -26,7 +26,7 @@ const formatBlockElement = element => {
   switch (element.type) {
     case 'context': {
       for (const item of element.elements) {
-        blockOutput.push(item.text.replace(/\*/g, '**'));
+        blockOutput.push(item.text.replace(/\*/g, '**') + ' ');
       }
       break;
     }
