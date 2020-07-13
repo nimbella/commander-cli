@@ -14,9 +14,7 @@
 
 const shell = require('shelljs');
 const chalk = require('chalk');
-const figlet = require('figlet');
 const open = require('open');
-const terminalLink = require('terminal-link');
 const inquirer = require('inquirer');
 const inquirerCommandPrompt = require('inquirer-command-prompt');
 const { NimBaseCommand } = require('nimbella-cli/lib/NimBaseCommand');
@@ -38,23 +36,6 @@ inquirerCommandPrompt.setConfig({
 inquirer.registerPrompt('command', inquirerCommandPrompt);
 
 const init = async () => {
-  console.log(
-    chalk.green(
-      figlet.textSync('Commander CLI', {
-        horizontalLayout: 'default',
-        verticalLayout: 'default',
-      })
-    )
-  );
-  console.log(
-    'CLI which allows you to create, run & publish your serverless functions as commands\n'
-  );
-  const nimbella = terminalLink(
-    'Presented to you by Nimbella\n',
-    'https://nimbella.com'
-  );
-  console.log(nimbella);
-
   if (await login.isFirstLogin()) {
     await register(true);
   } else {
@@ -322,6 +303,7 @@ async function getCommand() {
       type: 'command',
       name: 'command',
       message: 'nc>',
+      prefix: '',
       autoCompletion: line => {
         if (line.startsWith('/nc')) {
           const modified = [];

@@ -56,7 +56,9 @@ const register = async () => {
   const { username, password } = await getUserCreds();
   await setClientCreds(username, password, 'cli');
 
-  console.log("Please wait, we're registering your account with commander...");
+  process.stdout.write(
+    "Please wait, we're registering your account with commander..."
+  );
   const res = await invokeCommand('register');
   const text = res.data.attachments
     ? res.data.attachments[0].text
@@ -69,7 +71,8 @@ const register = async () => {
     console.log('Failed to register with Commander');
     process.exit(1);
   } else {
-    console.log('done.');
+    process.stdout.write(' done\n\n');
+    console.log("Type 'help' anytime for tips and guidance.");
   }
 
   const { username: user, client } = await getClientCreds();
