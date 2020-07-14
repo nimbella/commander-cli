@@ -28,8 +28,8 @@ The following guide provides details for getting started using the Commander CLI
 - [Quick Start](#quick-start)
 - [Install a Command Set](#install-a-command-set)
 - [Develop a Command Set](#develop-a-command-set)
-- [Publish a Command Set](#publish-a-command-set)
 - [Install a Local Command Set](#install-a-local-command-set)
+- [Publish a Command Set](#publish-a-command-set)
 - [Invoke Commands Using API](#Invoke-Commands-Using-API)
 - [Support](#support)
 - [License](#license)
@@ -153,22 +153,6 @@ For this to take effect in Commander, we need to update the code using `csm_upda
 
 Congrats! You now know how to develop a Command Set using the Commander CLI. Try to modify `hola` now on your own.
 
-## Publish a Command Set
-
-There are two options to distribute and share a Command Set that you develop: via your GitHub Repository or via the Nimbella Command Set Registry.
-
-1. Publish as a GitHub Repository
-
-   Create a GitHub repository with your code and make sure `commands.yaml` is at the root of the repository.
-
-   To install Command Sets that are published as GitHub repositories, you need to run `/nc csm_install github:<your_github_username>/<repository_name>`. Ex: `/nc csm_install github:nimbella/greet`
-
-2. Publish to Nimbella Command Set Registry
-
-   Make a Pull Request to our [registry](https://github.com/nimbella/command-sets) with your Command Set. See our [contribution](https://github.com/nimbella/command-sets/blob/master/CONTRIBUTING.md) guide on the registry to learn more.
-
-   After your Command Set is in the registry, you can install it by running: `/nc csm_install <command_set_name>`. Ex: `/nc csm_install greet`
-
 ## Install a Local Command Set
 
 In this section, you will learn how to install a Command Set whose code is on your local machine.
@@ -178,6 +162,8 @@ You need to provide the location of the Command Set to `csm_install` to install 
 ```
 ? nc> csm_install /your/path/to/greet
 ```
+
+> **Note**: even relative paths work.
 
 That’s it. You can now run the commands available in your locally developed command set from the Commander CLI.
 
@@ -200,6 +186,22 @@ You can also switch the login context between CLI and messaging platform by runn
 ```
 ? nc> login
 ```
+
+## Publish a Command Set
+
+There are two options to distribute and share a Command Set that you develop: via your GitHub Repository or via the Nimbella Command Set Registry.
+
+1. Publish as a GitHub Repository
+
+   Create a GitHub repository with your code and make sure `commands.yaml` is at the root of the repository.
+
+   To install Command Sets that are published as GitHub repositories, you need to run `/nc csm_install github:<your_github_username>/<repository_name>`. Ex: `/nc csm_install github:nimbella/greet`
+
+2. Publish to Nimbella Command Set Registry
+
+   Make a Pull Request to our [registry](https://github.com/nimbella/command-sets) with your Command Set. See our [contribution](https://github.com/nimbella/command-sets/blob/master/CONTRIBUTING.md) guide on the registry to learn more.
+
+   After your Command Set is in the registry, you can install it by running: `/nc csm_install <command_set_name>`. Ex: `/nc csm_install greet`
 
 ## Invoke Commands Using API
 
