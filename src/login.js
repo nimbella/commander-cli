@@ -149,8 +149,8 @@ const login = async (args = []) => {
   return { text: 'Logged in successfully to ' + chalk.green(client) };
 };
 
-const getWorkbenchURL = () => {
-  return `${workbenchURL}?command=auth login` + ` --auth=${getAuth()}`;
+const getWorkbenchURL = async () => {
+  return `${workbenchURL}?command=auth login` + ` --auth=${await getAuth()}`;
 };
 
 const isFirstLogin = async () => {

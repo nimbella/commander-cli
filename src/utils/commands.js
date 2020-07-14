@@ -13,9 +13,9 @@
 // limitations under the License.
 
 const replCommands = [
-  '.clear',
-  '.exit',
-  '.help',
+  'clear',
+  'exit',
+  'help',
   'login',
   'workbench',
   'nim',

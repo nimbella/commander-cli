@@ -72,9 +72,9 @@ const getHelp = () => {
     )} - run commander commands`,
     '', // Empty line
     `${chalk.bold('REPL Commands')}`,
-    `${chalk.green('.exit')} - exit the repl`,
-    `${chalk.green('.clear')} - clear the repl`,
-    `${chalk.green('.help')} - display help in repl`,
+    `${chalk.green('exit')} - exit the repl`,
+    `${chalk.green('clear')} - clear the repl`,
+    `${chalk.green('help')} - display help in repl`,
     '', // Empty line
     `${chalk.bold('Commander Commands')}`,
     `${chalk.green(
@@ -92,25 +92,25 @@ const getHelp = () => {
 
 const commanderHelp = [
   {
-    name: 'What is Commander, what can I do with it?',
+    name: 'What is Commander, what can I do with it? 🔗',
     value:
       'https://nimbella.com/resources-commander/overview#what-is-commander',
   },
   {
-    name: 'Commander command reference',
+    name: 'Commander reference manual 🔗',
     value:
       'https://nimbella.com/resources-commander/reference#command-reference',
   },
   {
-    name: 'Creating and deploying custom commands',
+    name: 'Creating and deploying custom commands 📺',
     value: 'https://www.youtube.com/watch?v=HxaLII_IGzY',
   },
   {
-    name: 'What are Command-sets and how do I build them?',
+    name: 'What are Command-sets and how do I build them? 🔗',
     value: 'https://github.com/nimbella/command-sets',
   },
   {
-    name: 'Quick start on using Commander',
+    name: 'Quick start on using Commander 🔗',
     value: 'https://nimbella.com/resources-commander/quickstart#quickstart',
   },
 ];
@@ -220,8 +220,9 @@ const runCommand = async command => {
     }
 
     if (command === 'workbench') {
-      open(login.getWorkbenchURL());
-      return null;
+      const workbenchUrl = encodeURI(await login.getWorkbenchURL());
+      open(workbenchUrl);
+      return { text: `Opening ${workbenchUrl}...` };
     }
 
     if (command.startsWith('command_set')) {
@@ -351,19 +352,17 @@ async function main(args) {
     while (true) {
       const command = await getCommand();
       switch (command) {
-        case '.exit':
+        case 'exit':
           process.exit();
           break;
         case '':
           continue;
-        case '.clear':
+        case 'clear':
           console.clear();
           break;
-        case '.help':
         case '?':
-          console.log(getHelp());
-          break;
         case 'help': {
+          console.log(getHelp() + '\n');
           const { link } = await inquirer.prompt({
             type: 'list',
             name: 'link',
