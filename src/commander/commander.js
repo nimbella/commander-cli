@@ -25,6 +25,7 @@ const renderResult = require('../render');
 const { replCommands, commanderCommands } = require('../utils/commands');
 const { invokeCommand, register } = require('../utils');
 const commands = require('../commands');
+const yargs = require('yargs-parser');
 
 inquirerCommandPrompt.setConfig({
   history: {
@@ -39,10 +40,10 @@ const init = async () => {
   if (await login.isFirstLogin()) {
     await register(true);
   } else {
-    const { username, client } = await login.getClientCreds();
+    const { username, client, accountName } = await login.getClientCreds();
 
     console.log(
-      `Your client: ${chalk.bold(client)} (${username.slice(
+      `Your client: ${chalk.bold(accountName)} (${client}) (${username.slice(
         0,
         10
       )}...)\nYour namespace: ${(await login.getUserCreds()).namespace}`
@@ -194,11 +195,14 @@ const twirlTimer = () => {
 
 const runCommand = async command => {
   let loader = null;
-  const args = command
-    .trim()
-    .split(/\s/)
-    .filter(value => value !== '')
-    // Remove the command to return only args
+  const args = yargs(command)
+    ._.map(arg =>
+      // Strip ",' if args start with them.
+      arg.startsWith("'") || arg.startsWith('"')
+        ? arg.slice(1, arg.length - 1)
+        : arg
+    )
+    // Remove command from args
     .slice(1);
 
   try {
@@ -215,8 +219,8 @@ const runCommand = async command => {
       return null;
     }
 
-    if (command.startsWith('login')) {
-      return login.login(args);
+    if (command.startsWith('client')) {
+      return await commands.client(args);
     }
 
     if (command === 'workbench') {

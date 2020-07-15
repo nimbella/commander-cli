@@ -12,16 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const chalk = require('chalk');
-const workbenchURL = 'https://apigcp.nimbella.io/wb';
-
 const {
   addCommanderData,
   getCredentials,
   fileSystemPersister,
 } = require('nimbella-cli/lib/deployer');
 
-const error = msg => ({ attachments: [{ color: 'danger', text: msg }] });
+const workbenchURL = 'https://apigcp.nimbella.io/wb';
 
 /**
  * Returns the client name based on the length of the token.
@@ -46,16 +43,17 @@ const getUserCreds = async () => {
   return { username, password, namespace };
 };
 
-const setClientCreds = async (user, team, client) => {
+const setClientCreds = async ({ accountName, username, password, client }) => {
   const { commander = { clients: {} }, ow, namespace } = await getCredentials(
     fileSystemPersister
   );
-  commander.clients[user] = {
-    username: user,
-    password: team,
-    client: client,
+  commander.clients[username] = {
+    accountName,
+    username,
+    password,
+    client,
   };
-  commander.currentClient = user;
+  commander.currentClient = username;
 
   return await addCommanderData(
     ow.apihost,
@@ -94,61 +92,6 @@ const getAuth = async () => {
   return username + ':' + password;
 };
 
-const login = async (args = []) => {
-  const { prompt } = require('inquirer');
-
-  const [arg] = args;
-  if (args.length === 0) {
-    const currentClient = await getClientCreds();
-    const output = [
-      `Currently used credentials:`,
-      `User: ${currentClient.username}`,
-      `Client: ${currentClient.client}`,
-      '', // Empty line
-    ];
-
-    console.log(output.join('\n'));
-
-    const clients = Object.values(await getClients());
-    const choices = [];
-
-    for (const client of clients) {
-      choices.push({
-        name: `${client.client} (${client.username.slice(0, 5)}...)`,
-        value: client.username,
-      });
-    }
-
-    try {
-      const { userId } = await prompt([
-        {
-          type: 'list',
-          name: 'userId',
-          message: 'Select the account:',
-          choices: choices,
-        },
-      ]);
-
-      await setCurrentClient(userId);
-      return {
-        text: `Using ${userId} now.`,
-      };
-    } catch (err) {
-      return error(err.message);
-    }
-  }
-
-  const user = arg.slice(0, arg.lastIndexOf(':'));
-  const password = arg.slice(arg.lastIndexOf(':') + 1);
-  if (!user || !password) {
-    return error(`Failed to extract login creds from: ${arg}`);
-  }
-
-  const client = determineClient(arg.trim());
-  await setClientCreds(user, password, client);
-  return { text: 'Logged in successfully to ' + chalk.green(client) };
-};
-
 const getWorkbenchURL = async () => {
   return `${workbenchURL}?command=auth login` + ` --auth=${await getAuth()}`;
 };
@@ -163,7 +106,6 @@ const isFirstLogin = async () => {
 };
 
 module.exports = {
-  login,
   getAuth,
   getWorkbenchURL,
   getUserCreds,
@@ -172,4 +114,5 @@ module.exports = {
   setCurrentClient,
   isFirstLogin,
   getClients,
+  determineClient,
 };

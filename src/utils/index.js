@@ -54,7 +54,12 @@ const invokeCommand = async (command, body = {}) => {
 
 const register = async () => {
   const { username, password } = await getUserCreds();
-  await setClientCreds(username, password, 'cli');
+  await setClientCreds({
+    accountName: 'Commander CLI',
+    username,
+    password,
+    client: 'cli',
+  });
 
   process.stdout.write(
     "Please wait, we're registering your account with commander..."

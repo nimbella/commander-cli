@@ -16,7 +16,7 @@ const replCommands = [
   'clear',
   'exit',
   'help',
-  'login',
+  'client',
   'workbench',
   'nim',
   'command_set',

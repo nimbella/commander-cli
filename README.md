@@ -83,13 +83,13 @@ $ nim commander
 Command Sets are installed using the `csm_install` command followed by the name of the Command Set. For example, to install the [`dig` Command Set](https://github.com/nimbella/command-sets/tree/master/dig), execute the command shown below.
 
 ```
-? nc> csm_install dig
+nc> csm_install dig
 ```
 
 The output will resemble what is shown below.
 
 ```
-? nc> csm_install dig
+nc> csm_install dig
 Installed dig command-set for app nc, containing the following commands:
 dig: Perform DNS queries.
 ```
@@ -97,7 +97,7 @@ dig: Perform DNS queries.
 The Unix `dig` command allows you to query DNS records for hostnames. Now we can run it as a Command as in the example below.
 
 ```
-? nc> dig nimbella.com A
+nc> dig nimbella.com A
 nimbella.com Type: A TTL: 19 IP: 157.245.130.6
 ```
 
@@ -160,7 +160,7 @@ In this section, you will learn how to install a Command Set whose code is on yo
 You need to provide the location of the Command Set to `csm_install` to install it.
 
 ```
-? nc> csm_install /your/path/to/greet
+nc> csm_install /your/path/to/greet
 ```
 
 > **Note**: even relative paths work.
@@ -178,13 +178,13 @@ Run `/nc app_info` in your messaging platform to obtain the `cli-login` token.
 After you've obtained the token, run the below command with your token in Commander CLI to login to your messaging platform.
 
 ```
-? nc> login <your_login_token>
+nc> client add <workspace_name> <your_login_token>
 ```
 
-You can also switch the login context between CLI and messaging platform by running `login` without arguments.
+You can also switch the login context between CLI and messaging platform by running `client switch`.
 
 ```
-? nc> login
+nc> client switch
 ```
 
 ## Publish a Command Set
@@ -212,7 +212,7 @@ Use `api_get` to get an endpoint for a command.
 The output will also include the credentials required to execute the command. I've redacted them here.
 
 ```
-? nc> api_get hello Nimbella
+nc> api_get hello Nimbella
 Command parameters:
     {
       "user_id": "...",
