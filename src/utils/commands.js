@@ -12,6 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+const notSupportedByCLI = [
+  'app_add',
+  'app_admins',
+  'app_delete',
+  'app_rename',
+  'app_prefix',
+  'command_runners',
+  'command_coders',
+  'group_create',
+  'group_delete',
+  'group_list',
+  'group_members',
+  'user_log',
+];
+
 const replCommands = [
   'clear',
   'exit',
@@ -107,4 +122,5 @@ const commanderCommands = [
 module.exports = {
   replCommands,
   commanderCommands,
+  notSupportedByCLI,
 };

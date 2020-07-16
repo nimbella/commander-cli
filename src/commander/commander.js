@@ -22,7 +22,11 @@ const { nimbellaDir } = require('nimbella-cli/lib/deployer/credentials');
 
 const login = require('../login');
 const renderResult = require('../render');
-const { replCommands, commanderCommands } = require('../utils/commands');
+const {
+  replCommands,
+  commanderCommands,
+  notSupportedByCLI,
+} = require('../utils/commands');
 const { invokeCommand, register } = require('../utils');
 const commands = require('../commands');
 const yargs = require('yargs-parser');
@@ -207,6 +211,15 @@ const runCommand = async command => {
     .slice(1);
 
   try {
+    if (notSupportedByCLI.includes(command.split(' ')[0])) {
+      const { client } = await login.getClientCreds();
+      if (client === 'cli') {
+        return {
+          text: 'This command is not supported when the client is `cli`.',
+        };
+      }
+    }
+
     let requestBody = {};
 
     if (command.startsWith('csm_install') || command.startsWith('csm_update')) {
