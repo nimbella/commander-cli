@@ -68,6 +68,7 @@ const getHelp = () => {
     `${chalk.bold('USAGE')}`,
     `$ ${chalk.green('nim commander')} - launch Commander REPL`,
     `$ ${chalk.green('nim commander help')} - display help for Commander CLI.`,
+    `$ ${chalk.green('nim commander docs')} - open documentation`,
     `$ ${chalk.green(
       'nim commander <command> [command_params/command_options]'
     )} - run commander commands`,
@@ -379,6 +380,11 @@ async function main(args) {
           } else {
             await open(link);
           }
+          break;
+        }
+        case 'docs':
+        case 'doc': {
+          await open('https://github.com/nimbella/commander-cli#commander-cli');
           break;
         }
         case 'version':
