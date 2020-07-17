@@ -1,8 +1,7 @@
 {
   "name": "commander",
   "version": "0.1.0",
-  "description": "Commander CLI",
-  "main": "src/main.js",
+  "description": "Commander CLI is a Nimbella Commander development tool that allows you to create, run & publish your serverless functions as commands that can run in Slack, Microsoft Teams, and Mattermost.",
   "scripts": {
     "postpack": "rm -f oclif.manifest.json",
     "prepare": "oclif-dev manifest && oclif-dev readme",
@@ -13,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nimbella-corp/commander-cli.git"
+    "url": "git+https://github.com/nimbella/commander-cli.git"
   },
   "keywords": [
     "commander",
@@ -23,9 +22,9 @@
   ],
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/nimbella-corp/commander-cli/issues"
+    "url": "https://github.com/nimbella/commander-cli/issues"
   },
-  "homepage": "https://github.com/nimbella-corp/commander-cli#readme",
+  "homepage": "https://github.com/nimbella/commander-cli#readme",
   "devDependencies": {
     "@oclif/dev-cli": "^1.22.2",
     "@oclif/plugin-help": "^3.0.0",
