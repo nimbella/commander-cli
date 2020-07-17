@@ -140,6 +140,16 @@ const askQuestions = async () => {
         default: `hello${i} <name>`,
         message: `Define your command ${i}:`,
         name: 'commandDefinition',
+        validate: input => {
+          return new Promise((resolve, reject) => {
+            // Test if the second word contains < or [ which indicates that it is an option
+            if (!/\<|\[/.test(input.split(' ')[1])) {
+              reject('spaces are not allowed in command names.');
+            }
+
+            resolve(true);
+          });
+        },
       },
     ]);
 
