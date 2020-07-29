@@ -35,6 +35,7 @@ const replCommands = [
   'workbench',
   'nim',
   'command_set',
+  'history',
 ];
 
 const commanderCommands = [
