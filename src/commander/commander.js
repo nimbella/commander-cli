@@ -81,6 +81,7 @@ const getHelp = () => {
     `${chalk.green('exit')} - exit the repl`,
     `${chalk.green('clear')} - clear the repl`,
     `${chalk.green('help')} - display help in repl`,
+    `${chalk.green('history')} - show recently executed commands`,
     '', // Empty line
     `${chalk.bold('Commander Commands')}`,
     `${chalk.green(
@@ -235,6 +236,10 @@ const runCommand = async command => {
 
     if (command.startsWith('client')) {
       return await commands.client(args);
+    }
+
+    if (command.startsWith('history')) {
+      return await commands.history();
     }
 
     if (command === 'workbench') {

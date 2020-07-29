@@ -15,4 +15,5 @@
 module.exports = {
   commandSet: require('./command_set'),
   client: require('./client'),
+  history: require('./history'),
 };
