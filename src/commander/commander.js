@@ -221,6 +221,13 @@ const runCommand = async command => {
       }
     }
 
+    if (command.startsWith('doc')) {
+      await open('https://github.com/nimbella/commander-cli#commander-cli');
+      return {
+        text: `Opening https://github.com/nimbella/commander-cli#commander-cli...`,
+      };
+    }
+
     let requestBody = {};
 
     if (command.startsWith('csm_install') || command.startsWith('csm_update')) {
@@ -398,11 +405,6 @@ async function main(args) {
           } else {
             await open(link);
           }
-          break;
-        }
-        case 'docs':
-        case 'doc': {
-          await open('https://github.com/nimbella/commander-cli#commander-cli');
           break;
         }
         case 'version':
