@@ -66,17 +66,25 @@ function parseCommandProperties(cmd) {
 
   // Matches [-flag] or [-flag <value>]
   const options =
-    cmd.matchAll(/\[-([\w\d]+)\]|\[-([\w\d]+)(?:\s+\<([^\]]+))?\>]/g) || [];
+    cmd.match(/\[-([\w\d]+)\]|\[-([\w\d]+)(?:\s+\<([^\]]+))?\>]/g) || [];
 
   // Matches [<optional>]
-  const optionalParameters = cmd.matchAll(/\[\<([\w\d]+)\>\]/g) || [];
+  const optionalParameters = cmd.match(/\[\<([\w\d]+)\>\]/g) || [];
 
   // Matches <parameter>
-  const parameters = cmd.matchAll(/\<([\w\d]+)\>[^\]]/g) || [];
+  const parameters = cmd.match(/\<([\w\d]+)\>[^\]]/g) || [];
 
   for (const option of options) {
-    const name = option[1] ? option[1] : option[2];
-    const value = option[3] ? option[3] : name;
+    const flagValues = option.trim().split(' ');
+    const name =
+      flagValues.length === 2
+        ? flagValues[0].slice(2) // Remove [-
+        : flagValues[0].slice(2, -1); // Remove [-]
+
+    const value =
+      flagValues.length === 2
+        ? flagValues[1].slice(1, -2) // Remove <>]
+        : name;
 
     command.options.push({
       name,
@@ -85,11 +93,17 @@ function parseCommandProperties(cmd) {
   }
 
   for (const parameter of parameters) {
-    command.parameters.push({ name: parameter[1], optional: false });
+    command.parameters.push({
+      name: parameter.trim().slice(1, -1), // Remove <>
+      optional: false,
+    });
   }
 
   for (const optionalParameter of optionalParameters) {
-    command.parameters.push({ name: optionalParameter[1], optional: true });
+    command.parameters.push({
+      name: optionalParameter.trim().slice(2, -2), // Remove [<>]
+      optional: true,
+    });
   }
 
   return command;
