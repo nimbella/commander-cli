@@ -88,8 +88,14 @@ const getHelp = () => {
       'command_create <command> [<parameters>] ...'
     )} - Creates a command & opens online source editor`,
     `${chalk.green(
-      'csm_install <command-set> ...'
+      'csm_install <command-set>'
     )} - Install from Nimbella Command Set Registry: https://github.com/nimbella/command-sets`,
+    `${chalk.green(
+      'csm_install /path/to/your/command-set'
+    )} - Install a local Command Set.`,
+    `${chalk.green(
+      'csm_install github:<owner>/<repository>'
+    )} - Install a Command Set hosted on GitHub.`,
     '', // Empty line
     `Please refer https://nimbella.com/resources-commander/reference to learn about Commander commands.`,
   ];
