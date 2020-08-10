@@ -1,5 +1,5 @@
 const { join } = require('path');
-const { nimbellaDir } = require('nimbella-cli/lib/deployer/credentials');
+const { nimbellaDir } = require('nimbella-deployer');
 
 module.exports = async () => {
   const historyFile = join(

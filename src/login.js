@@ -16,7 +16,7 @@ const {
   addCommanderData,
   getCredentials,
   fileSystemPersister,
-} = require('nimbella-cli/lib/deployer');
+} = require('nimbella-deployer');
 
 const workbenchURL = 'https://apigcp.nimbella.io/wb';
 
