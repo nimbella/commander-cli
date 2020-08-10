@@ -17,8 +17,7 @@ const chalk = require('chalk');
 const open = require('open');
 const inquirer = require('inquirer');
 const inquirerCommandPrompt = require('inquirer-command-prompt');
-const { NimBaseCommand } = require('nimbella-cli/lib/NimBaseCommand');
-const { nimbellaDir } = require('nimbella-cli/lib/deployer/credentials');
+const { NimBaseCommand, nimbellaDir } = require('nimbella-deployer');
 
 const login = require('../login');
 const renderResult = require('../render');
