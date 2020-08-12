@@ -53,17 +53,21 @@ A CLI to interact with Commander from your terminal.
 
 USAGE
 $ nim commander - launch Commander REPL
-$ nim commander help - display help for Commander CLI.
+$ nim commander help - display help for Commander CLI
+$ nim commander docs - open documentation
 $ nim commander <command> [command_params/command_options] - run commander commands
 
 REPL Commands
-.exit - exit the repl
-.clear - clear the repl
-.help - display help in repl
+exit - exit the repl
+clear - clear the repl
+help - display help in repl
+history - show recently executed commands
 
 Commander Commands
 command_create <command> [<parameters>] ... - Creates a command & opens online source editor
-csm_install <command-set> ... - Install from Nimbella Command Set Registry: https://github.com/nimbella/command-sets
+csm_install <command-set> - Install from Nimbella Command Set Registry: https://github.com/nimbella/command-sets
+csm_install /path/to/your/command-set - Install a local Command Set
+csm_install github:<owner>/<repository> - Install a Command Set hosted on GitHub
 
 Please refer https://nimbella.com/resources-commander/reference to learn about Commander commands.
 ```

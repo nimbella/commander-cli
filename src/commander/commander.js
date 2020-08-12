@@ -70,7 +70,7 @@ const getHelp = () => {
     '', // Empty line
     `${chalk.bold('USAGE')}`,
     `$ ${chalk.green('nim commander')} - launch Commander REPL`,
-    `$ ${chalk.green('nim commander help')} - display help for Commander CLI.`,
+    `$ ${chalk.green('nim commander help')} - display help for Commander CLI`,
     `$ ${chalk.green('nim commander docs')} - open documentation`,
     `$ ${chalk.green(
       'nim commander <command> [command_params/command_options]'
@@ -91,10 +91,10 @@ const getHelp = () => {
     )} - Install from Nimbella Command Set Registry: https://github.com/nimbella/command-sets`,
     `${chalk.green(
       'csm_install /path/to/your/command-set'
-    )} - Install a local Command Set.`,
+    )} - Install a local Command Set`,
     `${chalk.green(
       'csm_install github:<owner>/<repository>'
-    )} - Install a Command Set hosted on GitHub.`,
+    )} - Install a Command Set hosted on GitHub`,
     '', // Empty line
     `Please refer https://nimbella.com/resources-commander/reference to learn about Commander commands.`,
   ];
