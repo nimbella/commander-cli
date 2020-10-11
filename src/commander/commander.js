@@ -130,8 +130,10 @@ const commanderHelp = [
 const csmOfflineHandler = async command => {
   const fs = require('fs');
   const path = require('path');
-  const commandSetRelativePath = command.split(' ')[1];
-  const commandSetDir = path.join(process.cwd(), commandSetRelativePath);
+  const commandSetPath = command.split(' ')[1];
+  const commandSetDir = path.isAbsolute(commandSetPath)
+    ? commandSetPath
+    : path.join(process.cwd(), commandSetPath);
 
   let requestBody = {};
   if (fs.existsSync(commandSetDir)) {
