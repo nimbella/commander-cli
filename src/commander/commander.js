@@ -195,6 +195,15 @@ const csmInstallOrUpdate = async command => {
         ],
       };
     });
+  } else {
+    response = {
+      attachments: [
+        {
+          color: 'danger',
+          text: `Path ${commandSetDir} doesn't exist.`,
+        },
+      ],
+    };
   }
 
   return response;
