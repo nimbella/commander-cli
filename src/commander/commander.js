@@ -127,13 +127,15 @@ const commanderHelp = [
   },
 ];
 
-const csmOfflineHandler = async command => {
+const csmInstallOrUpdate = async command => {
   const fs = require('fs');
   const path = require('path');
-  const commandSetRelativePath = command.split(' ')[1];
-  const commandSetDir = path.join(process.cwd(), commandSetRelativePath);
+  const commandSetPath = command.split(' ')[1];
+  const commandSetDir = path.isAbsolute(commandSetPath)
+    ? commandSetPath
+    : path.join(process.cwd(), commandSetPath);
 
-  let requestBody = {};
+  let response = {};
   if (fs.existsSync(commandSetDir)) {
     const execa = require('execa');
     const Listr = require('listr');
@@ -160,22 +162,25 @@ const csmOfflineHandler = async command => {
         },
       },
       {
-        title: `Uploading ${commandSetName}...`,
+        title: `${
+          command.startsWith('csm_update') ? 'Updating' : 'Installing'
+        } ${commandSetName}...`,
         task: async () => {
-          // Upload the zip
           await execa.command(`nim object create ${zipPath}`);
-
-          // Remove the zip
-          fs.unlinkSync(zipPath);
-
           // Retrieve the URL of the uploaded object.
           const { stdout: nim_project_url } = await execa.command(
             `nim object url ${path.basename(zipPath)}`
           );
 
-          requestBody = { nim_project_url };
+          // Remove the zip
+          fs.unlinkSync(zipPath);
+
           // Only pass the basename so the command set name doesn't contain paths.
           command = command.split(' ')[0] + ' ' + commandSetName;
+          const { data } = await invokeCommand(command, { nim_project_url });
+          response = data;
+          // Delete the object after installation is done.
+          await execa.command(`nim object delete ${path.basename(zipPath)}`);
         },
       },
     ]);
@@ -190,9 +195,18 @@ const csmOfflineHandler = async command => {
         ],
       };
     });
+  } else {
+    response = {
+      attachments: [
+        {
+          color: 'danger',
+          text: `Path ${commandSetDir} doesn't exist.`,
+        },
+      ],
+    };
   }
 
-  return { requestBody, command };
+  return response;
 };
 
 const twirlTimer = () => {
@@ -236,9 +250,7 @@ const runCommand = async command => {
     let requestBody = {};
 
     if (command.startsWith('csm_install') || command.startsWith('csm_update')) {
-      const result = await csmOfflineHandler(command);
-      requestBody = result.requestBody;
-      command = result.command;
+      return await csmInstallOrUpdate(command);
     }
 
     if (command === '?' || command === 'help') {

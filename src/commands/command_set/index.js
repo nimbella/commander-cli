@@ -156,8 +156,9 @@ const askQuestions = async () => {
         name: 'commandDefinition',
         validate: input => {
           return new Promise((resolve, reject) => {
+            const secondWord = input.split(' ')[1];
             // Test if the second word contains < or [ which indicates that it is an option
-            if (!/\<|\[/.test(input.split(' ')[1])) {
+            if (secondWord && !/\<|\[/.test(secondWord)) {
               reject('spaces are not allowed in command names.');
             }
 
