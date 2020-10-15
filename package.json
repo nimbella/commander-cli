@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Commander CLI is a Nimbella Commander development tool that allows you to create, run & publish your serverless functions as commands that can run in Slack, Microsoft Teams, and Mattermost.",
   "scripts": {
-    "postpack": "rm -f oclif.manifest.json",
+    "postpack": "rimraf oclif.manifest.json",
     "prepare": "oclif-dev manifest && oclif-dev readme",
     "version": "oclif-dev readme && git add README.md",
     "lint": "eslint \"**/*.js\" --fix --ignore-pattern node_modules/",
@@ -33,7 +33,8 @@
     "eslint-plugin-jest": "^22.5.1",
     "eslint-plugin-prettier": "^3.1.0",
     "husky": "^4.2.3",
-    "prettier": "^2.0.3"
+    "prettier": "^2.0.3",
+    "rimraf": "^3.0.2"
   },
   "dependencies": {
     "archiver": "^4.0.1",
