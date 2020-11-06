@@ -64,20 +64,36 @@ const register = async () => {
   process.stdout.write(
     "Please wait, we're registering your account with commander..."
   );
-  const res = await invokeCommand('register');
-  const text = res.data.attachments
-    ? res.data.attachments[0].text
-    : res.data.text;
-  if (
-    !text.startsWith('Registered successfully with Commander') &&
-    !text.startsWith("You've already registered with Commander")
-  ) {
-    console.log(text);
-    console.log('Failed to register with Commander');
+
+  try {
+    const res = await invokeCommand('register');
+    const text = res.data.attachments
+      ? res.data.attachments[0].text
+      : res.data.text;
+    if (
+      !text.startsWith('Registered successfully with Commander') &&
+      !text.startsWith("You've already registered with Commander")
+    ) {
+      console.log(text);
+      console.log('Failed to register with Commander');
+      process.exit(1);
+    } else {
+      process.stdout.write(' done\n\n');
+      console.log("Type 'help' anytime for tips and guidance.");
+    }
+  } catch (error) {
+    if (error.response && error.response.status === 401) {
+      console.error(
+        '\nInvalid credentials. Please run `nim auth refresh` or login again using `nim auth login`.'
+      );
+      process.exit(1);
+    }
+
+    console.error(error.message);
+    console.log(
+      'If you are unsure what to do next please raise an issue at https://github.com/nimbella/commander-cli/issues'
+    );
     process.exit(1);
-  } else {
-    process.stdout.write(' done\n\n');
-    console.log("Type 'help' anytime for tips and guidance.");
   }
 
   const { username: user, client } = await getClientCreds();
