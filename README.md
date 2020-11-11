@@ -28,6 +28,7 @@ The following guide provides details for getting started using the Commander CLI
 - [Quick Start](#quick-start)
 - [Install a Command Set](#install-a-command-set)
 - [Develop a Command Set](#develop-a-command-set)
+- [Login to Your Messaging Platform](#login-to-your-messaging-platform)
 - [Install a Local Command Set](#install-a-local-command-set)
 - [Publish a Command Set](#publish-a-command-set)
 - [Invoke Commands Using API](#Invoke-Commands-Using-API)
@@ -157,6 +158,24 @@ For this to take effect in Commander, we need to update the code using `csm_upda
 
 Congrats! You now know how to develop a Command Set using the Commander CLI. Try to modify `hola` now on your own.
 
+## Login to Your Messaging Platform
+
+You need a `cli-login` token to login to your messaging platform (Slack, Mattermost, Teams) from Commander CLI.
+
+**Run `/nc app_info` in your messaging platform to obtain the `cli-login` token.**
+
+After you've obtained the token, run the below command with your token in Commander CLI to login to your messaging platform.
+
+```
+nc> client add <workspace_name> <your_login_token>
+```
+
+You can also switch the login context between CLI and messaging platform by running `client switch`.
+
+```
+nc> client switch
+```
+
 ## Install a Local Command Set
 
 In this section, you will learn how to install a Command Set whose code is on your local machine.
@@ -172,24 +191,6 @@ nc> csm_install /your/path/to/greet
 That’s it. You can now run the commands available in your locally developed command set from the Commander CLI.
 
 To be able to access these commands from messaging platforms, you need to run the same command, but you should do it **after** you've logged in to your messaging platform from Commander CLI.
-
-**How to login to your messaging platform from Commander CLI**
-
-You need a `cli-login` token to login to your messaging platform (Slack, Mattermost, Teams) from Commander CLI.
-
-Run `/nc app_info` in your messaging platform to obtain the `cli-login` token.
-
-After you've obtained the token, run the below command with your token in Commander CLI to login to your messaging platform.
-
-```
-nc> client add <workspace_name> <your_login_token>
-```
-
-You can also switch the login context between CLI and messaging platform by running `client switch`.
-
-```
-nc> client switch
-```
 
 ## Publish a Command Set
 
