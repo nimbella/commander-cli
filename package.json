@@ -52,7 +52,7 @@
     "marked": "^0.8.2",
     "marked-terminal": "^4.0.0",
     "mkdirp": "^1.0.4",
-    "nimbella-deployer": "https://preview-apigcp.nimbella.io/nimbella-deployer-1.9.3.tgz",
+    "nimbella-deployer": "https://preview-apigcp.nimbella.io/nimbella-deployer-1.10.0.tgz",
     "open": "^7.0.3",
     "shelljs": "^0.8.3",
     "terminal-link": "^2.1.1",
