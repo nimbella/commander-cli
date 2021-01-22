@@ -31,10 +31,11 @@ const replCommands = [
   'clear',
   'exit',
   'help',
-  'client',
+  'client switch',
+  'client add',
   'workbench',
   'nim',
-  'command_set',
+  'command_set create',
   'history',
 ];
 
