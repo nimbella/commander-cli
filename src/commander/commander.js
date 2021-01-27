@@ -131,6 +131,11 @@ const csmInstallOrUpdate = async command => {
   const fs = require('fs');
   const path = require('path');
   const commandSetPath = command.split(' ')[1];
+  if (!path.isAbsolute(commandSetPath) && !commandSetPath.startsWith('./')) {
+    return {
+      text: 'skip',
+    };
+  }
   const commandSetDir = path.isAbsolute(commandSetPath)
     ? commandSetPath
     : path.join(process.cwd(), commandSetPath);
@@ -250,7 +255,10 @@ const runCommand = async command => {
     let requestBody = {};
 
     if (command.startsWith('csm_install') || command.startsWith('csm_update')) {
-      return await csmInstallOrUpdate(command);
+      const res = await csmInstallOrUpdate(command);
+      if (res.text !== 'skip') {
+        return res;
+      }
     }
 
     if (command === '?' || command === 'help') {
