@@ -167,7 +167,7 @@ You need a `cli-login` token to login to your messaging platform (Slack, Matterm
 After you've obtained the token, run the below command with your token in Commander CLI to login to your messaging platform.
 
 ```
-nc> client add <workspace_name> <your_login_token>
+nc> client login <your_login_token>
 ```
 
 You can also switch the login context between CLI and messaging platform by running `client switch`.
