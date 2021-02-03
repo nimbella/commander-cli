@@ -1,4 +1,4 @@
-const { getClientCreds } = require('../../login');
+const { getClientCreds } = require('../../credentials');
 
 module.exports = async args => {
   if (args[0] === 'switch') {

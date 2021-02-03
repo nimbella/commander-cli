@@ -1,6 +1,6 @@
 const chalk = require('chalk');
 const shell = require('shelljs');
-const { setClientCreds, determineClient } = require('../../login');
+const { setClientCreds, determineClient } = require('../../credentials');
 const { invokeCommand } = require('../../utils');
 const error = msg => ({ attachments: [{ color: 'danger', text: msg }] });
 

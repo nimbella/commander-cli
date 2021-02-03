@@ -1,4 +1,4 @@
-const { getClients, setCurrentClient } = require('../../login');
+const { getClients, setCurrentClient } = require('../../credentials');
 const { prompt } = require('inquirer');
 
 module.exports = async () => {
