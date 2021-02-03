@@ -293,7 +293,7 @@ const runCommand = async command => {
 
     if (command.startsWith('app_add') || command.startsWith('app_delete')) {
       return {
-        text: 'Sorry app addition/deletion is not supported in the cli mode',
+        text: 'Sorry, app addition/deletion is not supported in the cli mode',
       };
     }
 

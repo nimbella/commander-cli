@@ -32,7 +32,7 @@ const replCommands = [
   'exit',
   'help',
   'client switch',
-  'client add',
+  'client login',
   'workbench',
   'nim',
   'command_set create',
@@ -53,6 +53,7 @@ const commanderCommands = [
   'channel_add',
   'channel_delete',
   'channel_list',
+  'cli_login',
 
   'command_code',
   'command_coders',

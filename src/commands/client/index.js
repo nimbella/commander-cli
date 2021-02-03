@@ -3,8 +3,8 @@ const { getClientCreds } = require('../../login');
 module.exports = async args => {
   if (args[0] === 'switch') {
     return await require('./switch')(args);
-  } else if (args[0] === 'add') {
-    return await require('./add')(args);
+  } else if (args[0] === 'login') {
+    return await require('./login')(args);
   } else {
     const currentClient = await getClientCreds();
     const output = [
