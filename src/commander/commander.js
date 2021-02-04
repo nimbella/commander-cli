@@ -19,7 +19,7 @@ const inquirer = require('inquirer');
 const inquirerCommandPrompt = require('inquirer-command-prompt');
 const { NimBaseCommand, nimbellaDir } = require('nimbella-deployer');
 
-const login = require('../login');
+const login = require('../credentials');
 const renderResult = require('../render');
 const {
   replCommands,
