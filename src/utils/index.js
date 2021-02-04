@@ -13,7 +13,11 @@
 // limitations under the License.
 
 const axios = require('axios');
-const { getClientCreds, getUserCreds, setClientCreds } = require('../credentials');
+const {
+  getClientCreds,
+  getUserCreds,
+  setClientCreds,
+} = require('../credentials');
 
 const invokeCommand = async (command, body = {}) => {
   const { username, password, namespace } = await getUserCreds();

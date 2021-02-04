@@ -15,6 +15,7 @@
 const {
   addCommanderData,
   getCredentials,
+  getCurrentNamespace,
   fileSystemPersister,
 } = require('nimbella-deployer');
 
@@ -37,12 +38,14 @@ const determineClient = token => {
   }
 };
 
+// this function will throw if there is no current namespace
 const getUserCreds = async () => {
   const { namespace, ow } = await getCredentials(fileSystemPersister);
   const [username, password] = ow.api_key.split(':');
   return { username, password, namespace };
 };
 
+// this function will throw if there is no current namespace
 const setClientCreds = async ({ accountName, username, password, client }) => {
   const { commander = { clients: {} }, ow, namespace } = await getCredentials(
     fileSystemPersister
@@ -63,16 +66,18 @@ const setClientCreds = async ({ accountName, username, password, client }) => {
   );
 };
 
+// this function will throw if there is no current namespace
 const getClientCreds = async () => {
   const creds = await getCredentials(fileSystemPersister);
-
   return creds.commander.clients[creds.commander.currentClient];
 };
 
+// this function will throw if there is no current namespace
 const getClients = async () => {
   return (await getCredentials(fileSystemPersister)).commander.clients;
 };
 
+// this function will throw if there is no current namespace
 const setCurrentClient = async user => {
   const { commander, ow, namespace } = await getCredentials(
     fileSystemPersister
@@ -87,22 +92,29 @@ const setCurrentClient = async user => {
   );
 };
 
+// this function will throw if there is no current namespace
 const getAuth = async () => {
   const { username, password } = await getClientCreds();
   return username + ':' + password;
 };
 
+// FIXME: this function will not work for all deployments because the url is hardcoded
 const getWorkbenchURL = async () => {
   return `${workbenchURL}?command=auth login` + ` --auth=${await getAuth()}`;
 };
 
+/**
+ * Determines if this is the first time a namespace is loging in to the commander runtime.
+ * @returns {Boolean} or {null} return true or false only if there is an active namespace otherwise null
+ */
 const isFirstLogin = async () => {
-  const { commander } = await getCredentials(fileSystemPersister);
-  if (typeof commander === 'undefined') {
-    return true;
+  const hasNamespace = await getCurrentNamespace(fileSystemPersister);
+  if (hasNamespace) {
+    const { commander } = await getCredentials(fileSystemPersister);
+    return typeof commander === 'undefined';
+  } else {
+    return null;
   }
-
-  return false;
 };
 
 module.exports = {
@@ -115,4 +127,5 @@ module.exports = {
   isFirstLogin,
   getClients,
   determineClient,
+  currentNamespace: () => getCurrentNamespace(fileSystemPersister),
 };
