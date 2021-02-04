@@ -14,6 +14,7 @@
 
 const axios = require('axios');
 const {
+  getApiHost,
   getClientCreds,
   getUserCreds,
   setClientCreds,
@@ -22,7 +23,8 @@ const {
 const invokeCommand = async (command, body = {}) => {
   const { username, password, namespace } = await getUserCreds();
   const clientCreds = await getClientCreds();
-  const gateway = 'https://apigcp.nimbella.io/api/v1/web/nc/portal/cli-gateway';
+  // eslint-disable-next-line no-extra-parens
+  const gateway = (await getApiHost()) + '/api/v1/web/nc/portal/cli-gateway';
 
   const __ow_headers = {
     accept: 'application/json',
