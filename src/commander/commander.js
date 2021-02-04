@@ -40,7 +40,12 @@ inquirerCommandPrompt.setConfig({
 inquirer.registerPrompt('command', inquirerCommandPrompt);
 
 const init = async () => {
-  if (await login.isFirstLogin()) {
+  const isFirstCommanderLogin = await login.isFirstLogin();
+  if (isFirstCommanderLogin === null) {
+    console.error(
+      'You need to login with a client token to initialize your environment. Contact your Commander administrator for a token.'
+    );
+  } else if (isFirstCommanderLogin === true) {
     await register(true);
   } else {
     const { username, client, accountName } = await login.getClientCreds();
@@ -394,11 +399,18 @@ async function main(args) {
       console.log(getVersion());
       process.exit();
     } else {
-      if (await login.isFirstLogin()) {
-        await register(false);
+      const isFirstCommanderLogin = await login.isFirstLogin();
+      if (isFirstCommanderLogin === null) {
+        console.error(
+          'You need to login with a client token to initialize your environment. Contact your Commander administrator for a token.'
+        );
+      } else {
+        if (isFirstCommanderLogin === true) {
+          await register(false);
+        }
+        const result = await runCommand(args.join(' '));
+        console.log(renderResult(result));
       }
-      const result = await runCommand(args.join(' '));
-      console.log(renderResult(result));
     }
   } else {
     await init();
