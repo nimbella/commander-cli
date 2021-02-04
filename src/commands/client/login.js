@@ -37,7 +37,10 @@ module.exports = async args => {
   if (!res.data || !res.data.text) {
     return error(`Failed to login using creds: ${token}`);
   }
-  const cmd = shell.exec('nim auth login --auth ' + res.data.text);
+  const { apiHost, auth } = JSON.parse(res.data.text);
+  const cmd = shell.exec(
+    'nim auth login --auth ' + auth + ' --apihost=' + apiHost
+  );
   if (cmd.code) {
     return error(`Failed to login to the accountName`);
   }
