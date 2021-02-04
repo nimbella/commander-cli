@@ -230,13 +230,13 @@ const twirlTimer = () => {
 
 const runCommand = async command => {
   let loader = null;
-  const args = yargs(command)
-    ._.map(arg =>
-      // Strip ",' if args start with them.
-      arg.startsWith("'") || arg.startsWith('"')
-        ? arg.slice(1, arg.length - 1)
-        : arg
-    )
+  const raw = yargs(command);
+  const args = raw._.map(arg =>
+    // Strip ",' if args start with them.
+    arg.startsWith("'") || arg.startsWith('"')
+      ? arg.slice(1, arg.length - 1)
+      : arg
+  )
     // Remove command from args
     .slice(1);
 
@@ -272,6 +272,12 @@ const runCommand = async command => {
     }
 
     if (command.startsWith('client')) {
+      if (raw.apihost && !raw.apihost.length) {
+        return {
+          text: 'API Host is not specified',
+        };
+      }
+      args.push(raw.apihost);
       return await commands.client(args);
     }
 

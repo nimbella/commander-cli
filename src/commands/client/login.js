@@ -19,11 +19,11 @@ const { invokeCommand } = require('../../utils');
 const error = msg => ({ attachments: [{ color: 'danger', text: msg }] });
 
 module.exports = async args => {
-  const [, token] = args;
+  let [, token, apiHost] = args;
   if (!token) {
     return {
       text:
-        'Please provide valid arguments.\n ex: nim commander client login <cli_login_token>',
+        'Please provide valid arguments.\n ex: nim commander client login <cli_login_token> [--apihost <apihost>]',
     };
   }
 
@@ -33,13 +33,16 @@ module.exports = async args => {
     return error(`Failed to extract login creds from: ${token}`);
   }
 
-  const res = await invokeCommand('cli_login ' + token, token);
+  apiHost = apiHost
+    ? 'https://' + apiHost + '.nimbella.io'
+    : 'https://apigcp.nimbella.io';
+
+  const res = await invokeCommand('cli_login ' + token, token, apiHost);
   if (!res.data || !res.data.text) {
     return error(`Failed to login using creds: ${token}`);
   }
-  const { apiHost, auth } = JSON.parse(res.data.text);
   const cmd = shell.exec(
-    'nim auth login --auth ' + auth + ' --apihost=' + apiHost
+    'nim auth login --auth ' + res.data.text + ' --apihost=' + apiHost
   );
   if (cmd.code) {
     return error(`Failed to login to the accountName`);

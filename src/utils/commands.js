@@ -33,6 +33,7 @@ const replCommands = [
   'help',
   'client switch',
   'client login',
+  'client login <token> --apihost <apihost>',
   'workbench',
   'nim',
   'command_set create',

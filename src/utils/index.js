@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* eslint-disable no-extra-parens */
 const axios = require('axios');
 const {
   getApiHost,
@@ -20,11 +21,12 @@ const {
   setClientCreds,
 } = require('../credentials');
 
-const invokeCommand = async (command, body = {}) => {
+const invokeCommand = async (command, body = {}, apiHost) => {
   const { username, password, namespace } = await getUserCreds();
   const clientCreds = await getClientCreds();
-  // eslint-disable-next-line no-extra-parens
-  const gateway = (await getApiHost()) + '/api/v1/web/nc/portal/cli-gateway';
+  const gateway = apiHost
+    ? apiHost + '/api/v1/web/nc/portal/cli-gateway'
+    : (await getApiHost()) + '/api/v1/web/nc/portal/cli-gateway';
 
   const __ow_headers = {
     accept: 'application/json',
