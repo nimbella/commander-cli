@@ -33,9 +33,7 @@ module.exports = async args => {
     return error(`Failed to extract login creds from: ${token}`);
   }
 
-  apiHost = apiHost
-    ? 'https://' + apiHost + '.nimbella.io'
-    : 'https://apigcp.nimbella.io';
+  apiHost = apiHost ? apiHost : 'https://apigcp.nimbella.io';
 
   const res = await invokeCommand('cli_login ' + token, token, apiHost);
   if (!res.data || !res.data.text) {

@@ -277,6 +277,11 @@ const runCommand = async command => {
           text: 'API Host is not specified',
         };
       }
+      if (raw.apihost && !raw.apihost.startsWith('http')) {
+        return {
+          text: 'API Host needs to begin with http[s]',
+        };
+      }
       args.push(raw.apihost);
       return await commands.client(args);
     }
