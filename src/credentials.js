@@ -19,8 +19,6 @@ const {
   fileSystemPersister,
 } = require('nimbella-deployer');
 
-const workbenchURL = 'https://apigcp.nimbella.io/wb';
-
 /**
  * Returns the client name based on the length of the token.
  * @param {string} token - The login token.
@@ -66,6 +64,20 @@ const setClientCreds = async ({ accountName, username, password, client }) => {
   );
 };
 
+const getApiHost = async () => {
+  const creds = await getCredentials(fileSystemPersister);
+  return creds.ow
+    ? creds.ow.apihost
+      ? creds.ow.apihost
+      : 'https://apigcp.nimbella.io'
+    : 'https://apigcp.nimbella.io';
+};
+
+const getWorkbenchHost = async () => {
+  // eslint-disable-next-line no-extra-parens
+  return (await getApiHost()) + '/wb';
+};
+
 // this function will throw if there is no current namespace
 const getClientCreds = async () => {
   const creds = await getCredentials(fileSystemPersister);
@@ -100,7 +112,10 @@ const getAuth = async () => {
 
 // FIXME: this function will not work for all deployments because the url is hardcoded
 const getWorkbenchURL = async () => {
-  return `${workbenchURL}?command=auth login` + ` --auth=${await getAuth()}`;
+  return (
+    `${await getWorkbenchHost()}?command=auth login` +
+    ` --auth=${await getAuth()}`
+  );
 };
 
 /**
@@ -118,6 +133,7 @@ const isFirstLogin = async () => {
 };
 
 module.exports = {
+  getApiHost,
   getAuth,
   getWorkbenchURL,
   getUserCreds,
