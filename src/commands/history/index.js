@@ -13,7 +13,7 @@
 // limitations under the License.
 
 const { join } = require('path');
-const { nimbellaDir } = require('nimbella-deployer');
+const { nimbellaDir } = require('@nimbella/nimbella-deployer');
 
 module.exports = async () => {
   const historyFile = join(

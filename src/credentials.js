@@ -17,7 +17,7 @@ const {
   getCredentials,
   getCurrentNamespace,
   fileSystemPersister,
-} = require('nimbella-deployer');
+} = require('@nimbella/nimbella-deployer');
 
 /**
  * Returns the client name based on the length of the token.
