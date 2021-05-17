@@ -45,6 +45,7 @@ const init = async () => {
     console.error(
       'You need to login with a client token to initialize your environment. Contact your Commander administrator for a token.'
     );
+    process.exit(1);
   } else if (isFirstCommanderLogin === true) {
     await register(true);
   } else {
@@ -415,6 +416,7 @@ async function main(args) {
         console.error(
           'You need to login with a client token to initialize your environment. Contact your Commander administrator for a token.'
         );
+        process.exit(1);
       } else {
         if (isFirstCommanderLogin === true) {
           await register(false);
