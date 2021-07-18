@@ -233,7 +233,7 @@ const runCommand = async command => {
   const raw = yargs(command);
   const args = raw._.map(arg =>
     // Strip ",' if args start with them.
-    arg.startsWith("'") || arg.startsWith('"')
+    typeof arg === String && (arg.startsWith("'") || arg.startsWith('"'))
       ? arg.slice(1, arg.length - 1)
       : arg
   )
@@ -248,6 +248,13 @@ const runCommand = async command => {
           text: 'This command is not supported when the client is `cli`.',
         };
       }
+    }
+
+    if (command.startsWith('/nc')) {
+      command = command.substring(command.indexOf(' ') + 1).trim();
+    } else if (command.startsWith('nim') && shell.which('nim')) {
+      shell.exec(command);
+      return null;
     }
 
     if (command.startsWith('doc')) {
@@ -298,13 +305,6 @@ const runCommand = async command => {
 
     if (command.startsWith('command_set')) {
       return commands.commandSet(args);
-    }
-
-    if (command.startsWith('/nc')) {
-      command = command.substring(command.indexOf(' ') + 1);
-    } else if (command.startsWith('nim') && shell.which('nim')) {
-      shell.exec(command);
-      return null;
     }
 
     if (command.startsWith('app_add') || command.startsWith('app_delete')) {
