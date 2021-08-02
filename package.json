@@ -1,6 +1,6 @@
 {
-  "name": "commander",
-  "version": "0.1.0",
+  "name": "@nimbella/commander-cli",
+  "version": "1.1.1",
   "description": "Commander CLI is a Nimbella Commander development tool that allows you to create, run & publish your serverless functions as commands that can run in Slack, Microsoft Teams, and Mattermost.",
   "scripts": {
     "postpack": "rimraf oclif.manifest.json",
