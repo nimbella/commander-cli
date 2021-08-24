@@ -45,9 +45,11 @@ const getUserCreds = async () => {
 
 // this function will throw if there is no current namespace
 const setClientCreds = async ({ accountName, username, password, client }) => {
-  const { commander = { clients: {} }, ow, namespace } = await getCredentials(
-    fileSystemPersister
-  );
+  const {
+    commander = { clients: {} },
+    ow,
+    namespace,
+  } = await getCredentials(fileSystemPersister);
   commander.clients[username] = {
     accountName,
     username,
