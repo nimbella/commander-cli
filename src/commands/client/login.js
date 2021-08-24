@@ -22,8 +22,7 @@ module.exports = async args => {
   let [, token, apiHost] = args;
   if (!token) {
     return {
-      text:
-        'Please provide valid arguments.\n ex: nim commander client login <cli_login_token> [--apihost <apihost>]',
+      text: 'Please provide valid arguments.\n ex: nim commander client login <cli_login_token> [--apihost <apihost>]',
     };
   }
 

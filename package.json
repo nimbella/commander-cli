@@ -36,7 +36,8 @@
     "rimraf": "^3.0.2"
   },
   "dependencies": {
-    "@nimbella/nimbella-deployer": "^2.0.2",
+    "@nimbella/nimbella-deployer": "^3.0.0",
+    "@nimbella/nimbella-cli": "https://apigcp.nimbella.io/downloads/nim/nimbella-cli.tgz",
     "archiver": "^4.0.1",
     "axios": "^0.21.1",
     "chalk": "^4.0.0",
